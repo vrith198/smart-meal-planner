@@ -1,0 +1,25 @@
+{
+  "model_name": "smart_meal_planner_food_classifier",
+  "version": "1.0.0",
+  "architecture": "MobileNetV2 Transfer Learning",
+  "base_model": "MobileNetV2 (ImageNet pre-trained)",
+  "dataset": "Food-101 + Curated Regional Dishes",
+  "num_classes": 112,
+  "input_tensor": {
+    "name": "input_image",
+    "shape": [1, 224, 224, 3],
+    "dtype": "float32",
+    "normalization": "Normalized to [-1.0, 1.0]: (pixel / 127.5) - 1.0"
+  },
+  "output_tensor": {
+    "name": "class_probabilities",
+    "shape": [1, 112],
+    "dtype": "float32",
+    "activation": "softmax"
+  },
+  "quantization": "Post-training float16 / dynamic range quantization",
+  "target_platform": "Android LiteRT / TensorFlow Lite 2.14+",
+  "average_inference_latency_ms": 18.5,
+  "top1_accuracy": 0.814,
+  "top5_accuracy": 0.942
+}
