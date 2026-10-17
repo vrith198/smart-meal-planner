@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/ic_nav_dashboard"
+        android:title="@string/nav_dashboard" />
+
+    <item
+        android:id="@+id/navigation_recommendations"
+        android:icon="@drawable/ic_nav_recommendations"
+        android:title="@string/nav_recommendations" />
+
+    <item
+        android:id="@+id/navigation_scan"
+        android:icon="@drawable/ic_nav_scan"
+        android:title="@string/nav_scan" />
+
+    <item
+        android:id="@+id/navigation_planner"
+        android:icon="@drawable/ic_nav_planner"
+        android:title="@string/nav_planner" />
+
+    <item
+        android:id="@+id/navigation_grocery"
+        android:icon="@drawable/ic_nav_grocery"
+        android:title="@string/nav_grocery" />
+
+    <item
+        android:id="@+id/navigation_profile"
+        android:icon="@drawable/ic_nav_profile"
+        android:title="@string/nav_profile" />
+</menu>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Theme Brand Colors -->
+    <color name="primary">#81C784</color>
+    <color name="primary_dark">#1B5E20</color>
+    <color name="primary_light">#A5D6A7</color>
+    <color name="primary_container">#00531A</color>
+    <color name="on_primary">#00390E</color>
+    <color name="on_primary_container">#9DF4A0</color>
+
+    <color name="secondary">#80CBC4</color>
+    <color name="secondary_dark">#004D40</color>
+    <color name="secondary_light">#B2DFDB</color>
+    <color name="secondary_container">#005047</color>
+    <color name="on_secondary">#003730</color>
+
+    <color name="tertiary">#FFB74D</color>
+    <color name="tertiary_container">#773300</color>
+    <color name="accent_amber">#FFB300</color>
+    <color name="accent_calories">#FF8A65</color>
+    <color name="accent_protein">#64B5F6</color>
+    <color name="accent_carbs">#FFB74D</color>
+    <color name="accent_fat">#BA68C8</color>
+
+    <color name="background">#121411</color>
+    <color name="surface">#1A1C19</color>
+    <color name="surface_variant">#2E312C</color>
+    <color name="on_background">#E2E3DD</color>
+    <color name="on_surface">#E2E3DD</color>
+    <color name="on_surface_variant">#C3C8BC</color>
+    <color name="outline">#8D9387</color>
+    <color name="divider">#2E312C</color>
+
+    <color name="success">#81C784</color>
+    <color name="error">#FFB4AB</color>
+    <color name="error_container">#93000A</color>
+    <color name="on_error">#690005</color>
+    <color name="sync_pending">#FFB74D</color>
+    <color name="sync_done">#81C784</color>
+</resources>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Smart Meal Planner AI</string>
+    <string name="tagline">Intelligent Nutrition &amp; Meal Personalization</string>
+    <string name="disclaimer_educational">Smart Meal Planner AI is an educational wellness tool, not a medical diagnostic system. All nutritional calculations are estimates.</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_scan">Scan Meal</string>
+    <string name="nav_recommendations">Discover</string>
+    <string name="nav_planner">Planner</string>
+    <string name="nav_grocery">Grocery</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Auth -->
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Sign in to sync your meal plans and recommendations</string>
+    <string name="register_title">Create Account</string>
+    <string name="register_subtitle">Personalize your diet with on-device AI</string>
+    <string name="email_hint">Email Address</string>
+    <string name="password_hint">Password (min 6 characters)</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="name_hint">Full Name</string>
+    <string name="btn_login">Sign In</string>
+    <string name="btn_register">Register</string>
+    <string name="btn_forgot_password">Forgot Password?</string>
+    <string name="btn_guest">Continue Offline as Guest</string>
+    <string name="msg_guest_notice">Guest mode stores all data locally on your device. You can link an account later.</string>
+    <string name="auth_error_empty">Please fill in all required fields.</string>
+    <string name="auth_error_password_match">Passwords do not match.</string>
+    <string name="auth_error_invalid_email">Please enter a valid email address.</string>
+    <string name="password_reset_sent">Password reset email sent. Check your inbox.</string>
+
+    <!-- Dashboard -->
+    <string name="greeting_format">Hello, %1$s 👋</string>
+    <string name="daily_nutrition_overview">Today\'s Nutrition Overview</string>
+    <string name="calories_consumed_label">Calories</string>
+    <string name="protein_label">Protein</string>
+    <string name="carbs_label">Carbs</string>
+    <string name="fat_label">Fat</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="action_scan_meal">Scan Food</string>
+    <string name="action_view_planner">View Plan</string>
+    <string name="action_meal_history">Meal Log</string>
+    <string name="action_grocery_list">Grocery</string>
+    <string name="recent_meals">Recent Meals</string>
+    <string name="no_recent_meals">No meals logged today yet. Scan a food or add one to start tracking!</string>
+
+    <!-- Scan Meal & Camera -->
+    <string name="scan_title">On-Device Food Classifier</string>
+    <string name="scan_instructions">Take a photo or select an image from your gallery to identify the food and estimate nutrition.</string>
+    <string name="btn_take_photo">Capture Camera</string>
+    <string name="btn_choose_gallery">Choose Photo</string>
+    <string name="btn_choose_photo">Choose Photo</string>
+    <string name="model_inferring">Analyzing image with LiteRT...</string>
+    <string name="model_top_predictions">Predicted Food Labels</string>
+    <string name="model_low_confidence_warning">Confidence is moderate. Please confirm or pick the correct food label below.</string>
+    <string name="correct_label_hint">Search or pick correct food label</string>
+    <string name="btn_confirm_food">Proceed to Nutrition Analysis</string>
+    <string name="unsupported_food_notice">Food not recognized? You can select from our verified nutrition catalog manually.</string>
+
+    <!-- Meal Analysis -->
+    <string name="analysis_title">Nutritional Estimation</string>
+    <string name="serving_size_label">Serving Size</string>
+    <string name="serving_small">Small</string>
+    <string name="serving_medium">Medium (Standard)</string>
+    <string name="serving_large">Large</string>
+    <string name="serving_custom">Custom Grams</string>
+    <string name="custom_grams_hint">Weight in grams (e.g. 150)</string>
+    <string name="nutrition_breakdown">Estimated Nutrients</string>
+    <string name="nutrition_source_label">Data Source: %1$s</string>
+    <string name="btn_save_meal">Save to Daily Log</string>
+    <string name="meal_type_breakfast">Breakfast</string>
+    <string name="meal_type_lunch">Lunch</string>
+    <string name="meal_type_snack">Snack</string>
+    <string name="meal_type_dinner">Dinner</string>
+    <string name="meal_saved_success">Meal saved successfully!</string>
+
+    <!-- Recommendations -->
+    <string name="rec_title">Smart Meal Recommendations</string>
+    <string name="rec_subtitle">Multi-objective ranking powered by Fuzzy Logic &amp; UCB1 Bandit</string>
+    <string name="fuzzy_suitability_badge">Suitability: %1$d%%</string>
+    <string name="why_recommended">Why this meal?</string>
+    <string name="btn_like">Like</string>
+    <string name="btn_dislike">Dislike</string>
+    <string name="btn_add_to_plan">Add to Plan</string>
+    <string name="filter_all">All</string>
+    <string name="filter_veg">Vegetarian</string>
+    <string name="filter_high_protein">High Protein</string>
+    <string name="filter_low_budget">Budget Friendly</string>
+    <string name="feedback_recorded">Preference updated! Future recommendations will adapt.</string>
+
+    <!-- Meal Planner -->
+    <string name="planner_title">Daily &amp; Weekly Planner</string>
+    <string name="btn_regenerate_plan">Regenerate Plan</string>
+    <string name="btn_replace_meal">Replace</string>
+    <string name="plan_totals">Daily Plan Totals</string>
+
+    <!-- Grocery -->
+    <string name="grocery_title">Smart Grocery List</string>
+    <string name="btn_generate_from_plan">Generate from Meal Plan</string>
+    <string name="btn_add_item">Add Item</string>
+    <string name="clear_completed">Clear Completed</string>
+    <string name="no_grocery_items">Your grocery list is empty. Tap generate to add ingredients from your plan!</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Dietary Profile &amp; Goals</string>
+    <string name="goal_weight_loss">Weight Loss</string>
+    <string name="goal_maintenance">Maintenance</string>
+    <string name="goal_muscle_gain">Muscle Gain</string>
+    <string name="diet_veg">Vegetarian</string>
+    <string name="diet_non_veg">Non-Vegetarian</string>
+    <string name="diet_vegan">Vegan</string>
+    <string name="diet_eggetarian">Eggetarian</string>
+    <string name="budget_low">Low Budget (&lt; ₹150/day)</string>
+    <string name="budget_medium">Moderate (₹150 - ₹350/day)</string>
+    <string name="budget_high">Premium (&gt; ₹350/day)</string>
+    <string name="btn_save_profile">Save Profile</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="sync_status_title">Cloud Synchronization</string>
+    <string name="model_version_title">On-Device Model Version</string>
+    <string name="theme_title">Appearance Theme</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="delete_account">Delete Account Data</string>
+</resources>

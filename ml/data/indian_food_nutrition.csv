@@ -1,0 +1,21 @@
+food_id,food_name,aliases,serving_name,serving_weight_g,energy_kcal,protein_g,carbohydrates_g,fat_g,dietary_category,source,source_id
+IN_001,Roti,Chapati|Phulka|Wheat Flatbread,1 Piece,40,120.0,3.5,23.0,1.2,Vegetarian,IFCT-2017,A012
+IN_002,Steamed White Rice,Cooked Rice|Chawal,1 Medium Bowl,150,195.0,4.1,42.5,0.4,Vegan,IFCT-2017,B004
+IN_003,Yellow Dal Tadka,Toor Dal|Lentil Soup|Dal Fry,1 Medium Bowl,200,165.0,8.5,22.0,4.5,Vegetarian,IFCT-2017,B015
+IN_004,Idli,Steamed Rice Cake,2 Pieces,80,132.0,4.2,26.8,0.4,Vegan,IFCT-2017,C001
+IN_005,Plain Dosa,Crispy Rice Crepe|Sada Dosa,1 Dosa,100,168.0,3.9,29.4,3.7,Vegetarian,IFCT-2017,C002
+IN_006,Poha,Flattened Rice|Batata Poha,1 Medium Plate,150,225.0,4.5,41.0,4.8,Vegetarian,IFCT-2017,C010
+IN_007,Upma,Semolina Porridge|Rava Upma,1 Medium Bowl,150,210.0,5.2,33.5,6.2,Vegetarian,IFCT-2017,C011
+IN_008,Paneer Butter Masala,Cottage Cheese Curry|Paneer Makhani,1 Serving,200,340.0,11.5,14.0,26.0,Vegetarian,IFCT-2017,D005
+IN_009,Chole Masala,Chickpea Curry|Chana Masala,1 Bowl,200,280.0,12.0,38.0,9.0,Vegan,IFCT-2017,B022
+IN_010,Rajma Masala,Kidney Bean Curry,1 Bowl,200,260.0,11.0,36.0,7.5,Vegan,IFCT-2017,B024
+IN_011,Curd,Dahi|Plain Yogurt,1 Small Cup,100,61.0,3.5,4.7,3.3,Vegetarian,IFCT-2017,E001
+IN_012,Boiled Egg,Hard Boiled Egg,1 Large Egg,50,78.0,6.3,0.6,5.3,Eggetarian,USDA-FDC,171287
+IN_013,Egg Omelette,Masala Omelette|Egg Fry,2 Large Eggs,110,188.0,12.6,2.0,14.4,Eggetarian,USDA-FDC,173424
+IN_014,Chicken Curry,Murgh Curry|Indian Chicken Gravy,1 Serving,200,310.0,24.5,6.0,20.0,Non-Vegetarian,IFCT-2017,F008
+IN_015,Biryani Chicken,Chicken Dum Biryani,1 Regular Plate,300,540.0,26.0,65.0,19.0,Non-Vegetarian,IFCT-2017,C025
+IN_016,Vegetable Biryani,Veg Pulao|Dum Biryani Veg,1 Regular Plate,250,380.0,7.5,62.0,11.5,Vegetarian,IFCT-2017,C026
+IN_017,Aloo Gobi,Potato Cauliflower Curry,1 Cup,150,150.0,3.2,18.0,7.5,Vegan,IFCT-2017,D012
+IN_018,Palak Paneer,Spinach Cottage Cheese,1 Bowl,200,270.0,12.0,8.5,21.0,Vegetarian,IFCT-2017,D008
+IN_019,Samosa,Potato Stuffed Pastry,1 Piece,80,260.0,3.5,32.0,13.0,Vegetarian,IFCT-2017,C030
+IN_020,Masala Chai,Indian Spiced Tea with Milk,1 Cup,150,105.0,3.0,14.0,4.0,Vegetarian,IFCT-2017,G002
