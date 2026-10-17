@@ -1,0 +1,81 @@
+dietary_pref,cuisine_pref,budget_category,fitness_goal,activity_level,time_of_day,protein_pref,target_meal_category
+Vegetarian,South Indian,Low,Weight Loss,Moderate,Morning,Medium,breakfast
+Vegetarian,North Indian,Medium,Muscle Gain,Active,Morning,High,breakfast
+Vegan,Continental,Low,Weight Loss,Sedentary,Morning,Low,breakfast
+Eggetarian,Continental,Medium,Muscle Gain,Active,Morning,High,breakfast
+Vegetarian,South Indian,Low,Maintenance,Moderate,Morning,Medium,breakfast
+Non-Vegetarian,Continental,High,Muscle Gain,Active,Morning,High,breakfast
+Vegetarian,North Indian,Low,Maintenance,Sedentary,Morning,Medium,breakfast
+Vegan,South Indian,Low,Weight Loss,Moderate,Morning,Medium,breakfast
+Eggetarian,North Indian,Medium,Weight Loss,Moderate,Morning,High,breakfast
+Vegetarian,North Indian,Low,Weight Loss,Sedentary,Morning,Low,breakfast
+Vegetarian,North Indian,Medium,Maintenance,Moderate,Noon,Medium,lunch
+Non-Vegetarian,North Indian,High,Muscle Gain,Active,Noon,High,lunch
+Vegetarian,South Indian,Low,Weight Loss,Sedentary,Noon,Low,lunch
+Vegan,Continental,Medium,Weight Loss,Moderate,Noon,Medium,lunch
+Vegetarian,North Indian,Medium,Muscle Gain,Active,Noon,High,lunch
+Non-Vegetarian,Continental,High,Weight Loss,Active,Noon,High,lunch
+Eggetarian,South Indian,Low,Maintenance,Moderate,Noon,Medium,lunch
+Vegetarian,North Indian,Low,Weight Loss,Moderate,Noon,Medium,lunch
+Vegan,North Indian,Low,Maintenance,Sedentary,Noon,Low,lunch
+Non-Vegetarian,North Indian,Medium,Muscle Gain,Moderate,Noon,High,lunch
+Vegetarian,North Indian,Low,Weight Loss,Moderate,Evening,Low,snack
+Vegetarian,Continental,Medium,Maintenance,Moderate,Evening,Low,snack
+Vegan,Continental,Low,Weight Loss,Sedentary,Evening,Low,snack
+Eggetarian,Continental,Low,Muscle Gain,Active,Evening,Medium,snack
+Vegetarian,South Indian,Low,Maintenance,Sedentary,Evening,Low,snack
+Non-Vegetarian,Continental,Medium,Muscle Gain,Active,Evening,Medium,snack
+Vegetarian,North Indian,Low,Weight Loss,Sedentary,Evening,Low,snack
+Vegan,North Indian,Low,Maintenance,Moderate,Evening,Low,snack
+Vegetarian,Continental,High,Muscle Gain,Active,Evening,Medium,snack
+Eggetarian,North Indian,Low,Weight Loss,Moderate,Evening,Medium,snack
+Vegetarian,North Indian,Medium,Weight Loss,Sedentary,Night,Low,dinner
+Non-Vegetarian,North Indian,High,Muscle Gain,Active,Night,High,dinner
+Vegetarian,South Indian,Low,Maintenance,Moderate,Night,Medium,dinner
+Vegan,Continental,Medium,Weight Loss,Moderate,Night,Low,dinner
+Vegetarian,North Indian,High,Muscle Gain,Active,Night,High,dinner
+Non-Vegetarian,Continental,High,Weight Loss,Active,Night,High,dinner
+Eggetarian,North Indian,Medium,Maintenance,Moderate,Night,Medium,dinner
+Vegetarian,South Indian,Low,Weight Loss,Sedentary,Night,Low,dinner
+Vegan,South Indian,Low,Maintenance,Sedentary,Night,Low,dinner
+Non-Vegetarian,North Indian,Medium,Muscle Gain,Moderate,Night,High,dinner
+Vegetarian,South Indian,Low,Weight Loss,Moderate,Morning,Medium,breakfast
+Vegetarian,North Indian,High,Muscle Gain,Active,Morning,High,breakfast
+Vegan,Continental,Low,Weight Loss,Sedentary,Morning,Low,breakfast
+Eggetarian,Continental,Medium,Muscle Gain,Active,Morning,High,breakfast
+Vegetarian,South Indian,Low,Maintenance,Moderate,Morning,Medium,breakfast
+Non-Vegetarian,Continental,High,Muscle Gain,Active,Morning,High,breakfast
+Vegetarian,North Indian,Low,Maintenance,Sedentary,Morning,Medium,breakfast
+Vegan,South Indian,Low,Weight Loss,Moderate,Morning,Medium,breakfast
+Eggetarian,North Indian,Medium,Weight Loss,Moderate,Morning,High,breakfast
+Vegetarian,North Indian,Low,Weight Loss,Sedentary,Morning,Low,breakfast
+Vegetarian,North Indian,Medium,Maintenance,Moderate,Noon,Medium,lunch
+Non-Vegetarian,North Indian,High,Muscle Gain,Active,Noon,High,lunch
+Vegetarian,South Indian,Low,Weight Loss,Sedentary,Noon,Low,lunch
+Vegan,Continental,Medium,Weight Loss,Moderate,Noon,Medium,lunch
+Vegetarian,North Indian,Medium,Muscle Gain,Active,Noon,High,lunch
+Non-Vegetarian,Continental,High,Weight Loss,Active,Noon,High,lunch
+Eggetarian,South Indian,Low,Maintenance,Moderate,Noon,Medium,lunch
+Vegetarian,North Indian,Low,Weight Loss,Moderate,Noon,Medium,lunch
+Vegan,North Indian,Low,Maintenance,Sedentary,Noon,Low,lunch
+Non-Vegetarian,North Indian,Medium,Muscle Gain,Moderate,Noon,High,lunch
+Vegetarian,North Indian,Low,Weight Loss,Moderate,Evening,Low,snack
+Vegetarian,Continental,Medium,Maintenance,Moderate,Evening,Low,snack
+Vegan,Continental,Low,Weight Loss,Sedentary,Evening,Low,snack
+Eggetarian,Continental,Low,Muscle Gain,Active,Evening,Medium,snack
+Vegetarian,South Indian,Low,Maintenance,Sedentary,Evening,Low,snack
+Non-Vegetarian,Continental,Medium,Muscle Gain,Active,Evening,Medium,snack
+Vegetarian,North Indian,Low,Weight Loss,Sedentary,Evening,Low,snack
+Vegan,North Indian,Low,Maintenance,Moderate,Evening,Low,snack
+Vegetarian,Continental,High,Muscle Gain,Active,Evening,Medium,snack
+Eggetarian,North Indian,Low,Weight Loss,Moderate,Evening,Medium,snack
+Vegetarian,North Indian,Medium,Weight Loss,Sedentary,Night,Low,dinner
+Non-Vegetarian,North Indian,High,Muscle Gain,Active,Night,High,dinner
+Vegetarian,South Indian,Low,Maintenance,Moderate,Night,Medium,dinner
+Vegan,Continental,Medium,Weight Loss,Moderate,Night,Low,dinner
+Vegetarian,North Indian,High,Muscle Gain,Active,Night,High,dinner
+Non-Vegetarian,Continental,High,Weight Loss,Active,Night,High,dinner
+Eggetarian,North Indian,Medium,Maintenance,Moderate,Night,Medium,dinner
+Vegetarian,South Indian,Low,Weight Loss,Sedentary,Night,Low,dinner
+Vegan,South Indian,Low,Maintenance,Sedentary,Night,Low,dinner
+Non-Vegetarian,North Indian,Medium,Muscle Gain,Moderate,Night,High,dinner
