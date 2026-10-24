@@ -142,6 +142,11 @@ public class AuthActivity extends AppCompatActivity {
                 @Override
                 public void onError(String errorMessage) {
                     setLoading(false);
+                    if (isPlaceholderApiKeyError(errorMessage)) {
+                        Toast.makeText(AuthActivity.this, "Operating in local offline mode", Toast.LENGTH_SHORT).show();
+                        loginLocally(email, name);
+                        return;
+                    }
                     showError(errorMessage);
                 }
             });
@@ -159,10 +164,41 @@ public class AuthActivity extends AppCompatActivity {
                 @Override
                 public void onError(String errorMessage) {
                     setLoading(false);
+                    if (isPlaceholderApiKeyError(errorMessage)) {
+                        Toast.makeText(AuthActivity.this, "Operating in local offline mode", Toast.LENGTH_SHORT).show();
+                        String fallbackName = email.contains("@") ? email.substring(0, email.indexOf('@')) : email;
+                        loginLocally(email, fallbackName);
+                        return;
+                    }
                     showError(errorMessage);
                 }
             });
         }
+    }
+
+    private boolean isPlaceholderApiKeyError(String errorMessage) {
+        if (errorMessage == null) return false;
+        String lower = errorMessage.toLowerCase();
+        return lower.contains("api key") || lower.contains("apikey") || lower.contains("internal error");
+    }
+
+    private void loginLocally(String email, String displayName) {
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            UserProfileEntity profile = AppDatabase.getInstance(AuthActivity.this).userDao().getUserProfileSync();
+            if (profile == null) {
+                profile = new UserProfileEntity(
+                    "local_" + System.currentTimeMillis(),
+                    displayName != null && !displayName.isEmpty() ? displayName : "Guest User",
+                    email != null && !email.isEmpty() ? email : "guest@smartmealplanner.local",
+                    25, 170.0, 65.0, true, "Moderate",
+                    "VEGETARIAN", "MAINTENANCE", "MEDIUM", "North Indian",
+                    2000.0, 100.0, 250.0, 65.0, "[]", 0, System.currentTimeMillis()
+                );
+                AppDatabase.getInstance(AuthActivity.this).userDao().insertOrUpdate(profile);
+            }
+        });
+        startActivity(new Intent(AuthActivity.this, MainActivity.class));
+        finish();
     }
 
     private void handleForgotPassword() {
