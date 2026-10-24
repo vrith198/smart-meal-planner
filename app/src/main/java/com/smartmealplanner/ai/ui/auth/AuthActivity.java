@@ -183,11 +183,12 @@ public class AuthActivity extends AppCompatActivity {
     }
 
     private void loginLocally(String email, String displayName) {
+        String userId = FirebaseManager.GUEST_USER_ID;
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            UserProfileEntity profile = AppDatabase.getInstance(AuthActivity.this).userDao().getUserProfileSync();
+            UserProfileEntity profile = AppDatabase.getInstance(AuthActivity.this).userDao().getUserProfileSync(userId);
             if (profile == null) {
                 profile = new UserProfileEntity(
-                    "local_" + System.currentTimeMillis(),
+                    userId,
                     displayName != null && !displayName.isEmpty() ? displayName : "Guest User",
                     email != null && !email.isEmpty() ? email : "guest@smartmealplanner.local",
                     25, 170.0, 65.0, true, "Moderate",
