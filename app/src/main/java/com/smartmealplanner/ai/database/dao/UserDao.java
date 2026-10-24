@@ -22,12 +22,6 @@ public interface UserDao {
     @Query("SELECT * FROM user_profiles WHERE userId = :userId LIMIT 1")
     UserProfileEntity getUserProfileSync(String userId);
 
-    @Query("SELECT * FROM user_profiles LIMIT 1")
-    UserProfileEntity getUserProfileSync();
-
-    @Query("SELECT * FROM user_profiles LIMIT 1")
-    UserProfileEntity getUserProfileSync();
-
     @Query("SELECT * FROM user_profiles WHERE syncState != 0")
     List<UserProfileEntity> getPendingSyncProfiles();
 
