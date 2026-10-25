@@ -70,6 +70,13 @@ public class DashboardFragment extends Fragment {
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault());
         tvCurrentDate.setText(sdf.format(new Date()));
 
+        // Greeting click opens Profile
+        tvGreeting.setOnClickListener(view -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).openProfile();
+            }
+        });
+
         // Quick Actions
         MaterialCardView cardScan = v.findViewById(R.id.cardQuickScan);
         MaterialCardView cardPlanner = v.findViewById(R.id.cardQuickPlanner);

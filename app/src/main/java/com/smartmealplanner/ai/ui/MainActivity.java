@@ -32,10 +32,12 @@ public class MainActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottom_navigation);
         ivSyncStatus = findViewById(R.id.ivSyncStatus);
         ImageView btnHistory = findViewById(R.id.btnHistoryMenu);
+        ImageView btnProfile = findViewById(R.id.btnProfileMenu);
         ImageView btnSettings = findViewById(R.id.btnSettingsMenu);
 
         // Header toolbar actions
         btnHistory.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, MealHistoryActivity.class)));
+        btnProfile.setOnClickListener(v -> openProfile());
         btnSettings.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, SettingsActivity.class)));
 
         // Network sync indicator
@@ -55,8 +57,6 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new MealPlannerFragment();
             } else if (itemId == R.id.navigation_grocery) {
                 selectedFragment = new GroceryFragment();
-            } else if (itemId == R.id.navigation_profile) {
-                selectedFragment = new ProfileFragment();
             }
 
             if (selectedFragment != null) {
@@ -98,5 +98,15 @@ public class MainActivity extends AppCompatActivity {
         if (bottomNav != null) {
             bottomNav.setSelectedItemId(navItemId);
         }
+    }
+
+    /**
+     * Open User Nutrition Profile Fragment.
+     */
+    public void openProfile() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new ProfileFragment())
+                .addToBackStack(null)
+                .commit();
     }
 }

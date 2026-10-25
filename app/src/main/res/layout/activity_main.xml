@@ -43,8 +43,19 @@
                     android:layout_marginEnd="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="4dp"
-                    android:src="@drawable/ic_nav_planner"
+                    android:src="@drawable/ic_history"
                     android:contentDescription="@string/nav_history"
+                    app:tint="@color/on_surface" />
+
+                <ImageView
+                    android:id="@+id/btnProfileMenu"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_nav_profile"
+                    android:contentDescription="@string/nav_profile"
                     app:tint="@color/on_surface" />
 
                 <ImageView
@@ -54,7 +65,7 @@
                     android:layout_marginEnd="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="4dp"
-                    android:src="@drawable/ic_nav_profile"
+                    android:src="@drawable/ic_nav_settings"
                     android:contentDescription="@string/nav_settings"
                     app:tint="@color/on_surface" />
 
