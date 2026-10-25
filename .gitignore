@@ -76,3 +76,8 @@ ml/data/food-101.tar.gz
 ml/data/raw/
 *.h5
 *.ckpt
+
+# Academic Project Documentation
+docs/
+*.docx
+
