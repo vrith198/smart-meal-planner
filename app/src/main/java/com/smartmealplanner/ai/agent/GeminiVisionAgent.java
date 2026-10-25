@@ -68,7 +68,8 @@ public class GeminiVisionAgent {
     public static void setApiKey(Context context, String apiKey) {
         if (context == null) return;
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        prefs.edit().putString(KEY_GEMINI_API_KEY, apiKey != null ? apiKey.trim() : "").apply();
+        String cleaned = apiKey != null ? apiKey.trim().replace("\"", "").replace("'", "") : "";
+        prefs.edit().putString(KEY_GEMINI_API_KEY, cleaned).apply();
     }
 
     public static void clearApiKey(Context context) {

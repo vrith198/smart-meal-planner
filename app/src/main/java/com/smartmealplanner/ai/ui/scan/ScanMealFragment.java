@@ -337,8 +337,24 @@ public class ScanMealFragment extends Fragment {
             tvAiMacroCarbs.setText("Carbs: " + p1.getCarbs() + "g");
             tvAiMacroFat.setText("Fat: " + p1.getFat() + "g");
 
-            if (tvAiIngredients != null) tvAiIngredients.setVisibility(View.GONE);
-            if (tvAiHealthNotes != null) tvAiHealthNotes.setVisibility(View.GONE);
+            if (p1.getIngredients() != null && !p1.getIngredients().isEmpty()) {
+                if (tvAiIngredients != null) {
+                    tvAiIngredients.setText("🥗 Ingredients: " + joinStrings(p1.getIngredients(), ", "));
+                    tvAiIngredients.setVisibility(View.VISIBLE);
+                }
+            } else {
+                if (tvAiIngredients != null) tvAiIngredients.setVisibility(View.GONE);
+            }
+
+            if (p1.getHealthNotes() != null && !p1.getHealthNotes().isEmpty()) {
+                if (tvAiHealthNotes != null) {
+                    tvAiHealthNotes.setText("💡 " + p1.getHealthNotes());
+                    tvAiHealthNotes.setVisibility(View.VISIBLE);
+                }
+            } else {
+                if (tvAiHealthNotes != null) tvAiHealthNotes.setVisibility(View.GONE);
+            }
+
             if (btnAnalyzeWithGemini != null) btnAnalyzeWithGemini.setEnabled(true);
             if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
 
@@ -517,7 +533,7 @@ public class ScanMealFragment extends Fragment {
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Google Gemini Vision API Key")
-                .setMessage("Enter your Gemini API key to enable multimodal AI vision analysis for arbitrary meal photos.\n(Get a free key from aistudio.google.com)")
+                .setMessage("Paste your Gemini API key (starts with AIzaSy...) to analyze custom or restaurant meals via cloud AI.\n\nDon't have a key? Tap 'Get Free Key' to open Google AI Studio in your browser.")
                 .setView(container)
                 .setPositiveButton("Save & Use", (dialog, which) -> {
                     String entered = input.getText().toString().trim();
@@ -528,7 +544,7 @@ public class ScanMealFragment extends Fragment {
                             onKeySaved.run();
                         }
                     } else {
-                        Toast.makeText(getContext(), "API Key cannot be empty.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "API Key cannot be empty. Paste your AIzaSy... key or use On-Device AI.", Toast.LENGTH_LONG).show();
                     }
                 })
                 .setNegativeButton("Cancel", null);
@@ -537,6 +553,15 @@ public class ScanMealFragment extends Fragment {
             builder.setNeutralButton("Clear Key", (dialog, which) -> {
                 GeminiVisionAgent.clearApiKey(getContext());
                 Toast.makeText(getContext(), "Gemini API Key removed.", Toast.LENGTH_SHORT).show();
+            });
+        } else {
+            builder.setNeutralButton("Get Free Key", (dialog, which) -> {
+                try {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://aistudio.google.com/"));
+                    startActivity(browserIntent);
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Please open aistudio.google.com in your browser.", Toast.LENGTH_SHORT).show();
+                }
             });
         }
 

@@ -107,6 +107,30 @@ public class FoodClassifier {
         0.4800f, 0.3400f, 0.1900f, 0.5500f, 0.3900f, 0.2200f, 0.5400f, 0.3800f, 0.2100f, 0.4700f, 0.3300f, 0.1800f
     };
 
+    private static final float[] VEC_IDLI = new float[]{
+        0.8300f, 0.8300f, 0.8100f, 0.0300f, 0.0500f, 0.0800f,
+        0.8100f, 0.8100f, 0.7900f, 0.8400f, 0.8400f, 0.8200f, 0.8400f, 0.8400f, 0.8200f, 0.8100f, 0.8100f, 0.7900f,
+        0.8200f, 0.8200f, 0.8000f, 0.8500f, 0.8500f, 0.8300f, 0.8500f, 0.8500f, 0.8300f, 0.8200f, 0.8200f, 0.8000f,
+        0.8200f, 0.8200f, 0.8000f, 0.8500f, 0.8500f, 0.8300f, 0.8500f, 0.8500f, 0.8300f, 0.8200f, 0.8200f, 0.8000f,
+        0.8000f, 0.8000f, 0.7800f, 0.8300f, 0.8300f, 0.8100f, 0.8300f, 0.8300f, 0.8100f, 0.8000f, 0.8000f, 0.7800f
+    };
+
+    private static final float[] VEC_DOSA = new float[]{
+        0.6600f, 0.4900f, 0.2800f, 0.0000f, 0.5500f, 0.4200f,
+        0.6300f, 0.4600f, 0.2600f, 0.6800f, 0.5100f, 0.3000f, 0.6700f, 0.5000f, 0.2900f, 0.6200f, 0.4500f, 0.2500f,
+        0.6500f, 0.4800f, 0.2700f, 0.6900f, 0.5200f, 0.3100f, 0.6800f, 0.5100f, 0.3000f, 0.6400f, 0.4700f, 0.2600f,
+        0.6400f, 0.4700f, 0.2600f, 0.6800f, 0.5100f, 0.3000f, 0.6700f, 0.5000f, 0.2900f, 0.6300f, 0.4600f, 0.2500f,
+        0.6100f, 0.4400f, 0.2400f, 0.6500f, 0.4800f, 0.2700f, 0.6400f, 0.4700f, 0.2600f, 0.6000f, 0.4300f, 0.2300f
+    };
+
+    private static final float[] VEC_BIRYANI = new float[]{
+        0.6800f, 0.5200f, 0.3000f, 0.0200f, 0.5200f, 0.5500f,
+        0.6500f, 0.4900f, 0.2800f, 0.7000f, 0.5400f, 0.3200f, 0.6900f, 0.5300f, 0.3100f, 0.6400f, 0.4800f, 0.2700f,
+        0.6600f, 0.5000f, 0.2900f, 0.7100f, 0.5500f, 0.3300f, 0.7000f, 0.5400f, 0.3200f, 0.6500f, 0.4900f, 0.2800f,
+        0.6500f, 0.4900f, 0.2800f, 0.7000f, 0.5400f, 0.3200f, 0.6900f, 0.5300f, 0.3100f, 0.6400f, 0.4800f, 0.2700f,
+        0.6300f, 0.4700f, 0.2600f, 0.6700f, 0.5100f, 0.3000f, 0.6600f, 0.5000f, 0.2900f, 0.6200f, 0.4600f, 0.2500f
+    };
+
     public static class NutritionInfo {
         public String id;
         public String name;
@@ -117,6 +141,9 @@ public class FoodClassifier {
         public double fatPer100g;
         public int mediumServingGrams;
         public String servingUnitName;
+        public List<String> ingredients = new ArrayList<>();
+        public String dietaryType = "VEGETARIAN";
+        public String healthNotes = "";
 
         public int calculateServingCalories() {
             return (int) Math.round((caloriesPer100g * mediumServingGrams) / 100.0);
@@ -199,6 +226,21 @@ public class FoodClassifier {
                 info.fatPer100g = obj.optDouble("fatPer100g", 5.0);
                 info.mediumServingGrams = obj.optInt("mediumServingGrams", 150);
                 info.servingUnitName = obj.optString("servingUnitName", "1 Serving");
+                info.dietaryType = obj.optString("dietaryType", "VEGETARIAN");
+
+                JSONArray ingArr = obj.optJSONArray("ingredients");
+                if (ingArr != null) {
+                    for (int j = 0; j < ingArr.length(); j++) {
+                        JSONObject ingObj = ingArr.optJSONObject(j);
+                        if (ingObj != null) {
+                            String ingName = ingObj.optString("name", "");
+                            if (!ingName.isEmpty()) info.ingredients.add(ingName);
+                        }
+                    }
+                }
+
+                String src = obj.optString("source", "Standard Reference");
+                info.healthNotes = src + " (" + info.dietaryType + "). Nutrient-dense wholesome meal.";
 
                 if (!info.label.isEmpty()) {
                     nutritionMap.put(info.label, info);
@@ -313,6 +355,9 @@ public class FoodClassifier {
         float distDal = calculateDistance(vec, VEC_DAL);
         float distRice = calculateDistance(vec, VEC_RICE);
         float distSamosa = calculateDistance(vec, VEC_SAMOSA);
+        float distIdli = calculateDistance(vec, VEC_IDLI);
+        float distDosa = calculateDistance(vec, VEC_DOSA);
+        float distBiryani = calculateDistance(vec, VEC_BIRYANI);
 
         // Compute base affinities from inverse distance squared
         float ap = 1.0f / ((distPizza + 0.015f) * (distPizza + 0.015f));
@@ -323,6 +368,9 @@ public class FoodClassifier {
         float aDal = 1.0f / ((distDal + 0.015f) * (distDal + 0.015f));
         float aRice = 1.0f / ((distRice + 0.015f) * (distRice + 0.015f));
         float aSamosa = 1.0f / ((distSamosa + 0.015f) * (distSamosa + 0.015f));
+        float aIdli = 1.0f / ((distIdli + 0.015f) * (distIdli + 0.015f));
+        float aDosa = 1.0f / ((distDosa + 0.015f) * (distDosa + 0.015f));
+        float aBiryani = 1.0f / ((distBiryani + 0.015f) * (distBiryani + 0.015f));
 
         // Color feature metrics
         float rMean = vec[0];
@@ -377,16 +425,35 @@ public class FoodClassifier {
             ap *= 5.0f;
         }
 
-        // E. Steamed Rice:
-        // High overall white brightness
-        if (rMean > 0.70f && gMean > 0.70f && bMean > 0.65f) {
+        // I. Steamed Idli:
+        // Pure white/pale light spongy circular cakes (high overall brightness, low saturation)
+        if (rMean > 0.72f && gMean > 0.72f && bMean > 0.68f && redness < 0.20f) {
+            aIdli *= 14.0f;
+            as_ *= 0.05f;
+            aBurger *= 0.05f;
+        }
+
+        // J. Dal Tadka / Yellow Dal / Dal-Rice:
+        // Turmeric yellow lentil gravy; often combined with rice
+        if (yellowness > 0.20f && rMean > 0.48f && gMean > 0.38f && bMean < 0.32f && greenness < 0.05f) {
+            aDal *= 14.0f;
+            aRice *= 4.0f; // Paired staple
+            as_ *= 0.05f;
+        }
+
+        // K. Steamed Basmati Rice:
+        if (rMean > 0.68f && gMean > 0.68f && bMean > 0.60f && redness < 0.25f && yellowness < 0.25f) {
             aRice *= 8.0f;
         }
 
-        // F. Dal Tadka / Yellow Lentil Curry:
-        // Bright turmeric yellow liquid/gravy
-        if (rMean > 0.52f && gMean > 0.42f && bMean < 0.25f && yellowness > 0.28f && greenness < 0.03f) {
-            aDal *= 8.0f;
+        // L. Crispy Dosa:
+        if (rMean > 0.58f && gMean > 0.42f && bMean > 0.22f && bMean < 0.36f && yellowness > 0.22f && !hasTopBun) {
+            aDosa *= 8.0f;
+        }
+
+        // M. Fragrant Biryani:
+        if (rMean > 0.60f && gMean > 0.46f && bMean > 0.24f && yellowness > 0.32f && redness > 0.30f && !hasTopBun) {
+            aBiryani *= 8.0f;
         }
 
         // G. Whole Wheat Roti:
@@ -401,16 +468,19 @@ public class FoodClassifier {
             aSamosa *= 4.0f;
         }
 
-        float total = ap + as_ + af + aBurger + aSamosa + aDal + aRoti + aRice;
+        float total = ap + as_ + af + aBurger + aSamosa + aDal + aRoti + aRice + aIdli + aDosa + aBiryani;
 
+        candidates.add(createPrediction("idli", aIdli / total));
+        candidates.add(createPrediction("dal", aDal / total));
+        candidates.add(createPrediction("rice", aRice / total));
+        candidates.add(createPrediction("dosa", aDosa / total));
+        candidates.add(createPrediction("biryani", aBiryani / total));
         candidates.add(createPrediction("hamburger", aBurger / total));
         candidates.add(createPrediction("pizza", ap / total));
         candidates.add(createPrediction("caesar_salad", as_ / total));
         candidates.add(createPrediction("french_fries", af / total));
         candidates.add(createPrediction("samosa", aSamosa / total));
-        candidates.add(createPrediction("dal", aDal / total));
         candidates.add(createPrediction("roti", aRoti / total));
-        candidates.add(createPrediction("rice", aRice / total));
 
         Collections.sort(candidates, (a, b) -> Float.compare(b.getConfidence(), a.getConfidence()));
 
@@ -424,6 +494,10 @@ public class FoodClassifier {
                     top.getCalories(), top.getProtein(), top.getCarbs(), top.getFat(),
                     top.getServingUnit(), top.getFoodId()
                 );
+                adjustedTop.setIngredients(top.getIngredients());
+                adjustedTop.setHealthNotes(top.getHealthNotes());
+                adjustedTop.setDietaryType(top.getDietaryType());
+                adjustedTop.setAiSource(top.getAiSource());
                 candidates.set(0, adjustedTop);
             }
         }
@@ -466,7 +540,14 @@ public class FoodClassifier {
             foodId = info.id;
         }
 
-        return new PredictionResult(label, displayName, confidence, calories, protein, carbs, fat, servingUnit, foodId);
+        PredictionResult pred = new PredictionResult(label, displayName, confidence, calories, protein, carbs, fat, servingUnit, foodId);
+        if (info != null) {
+            pred.setIngredients(new ArrayList<>(info.ingredients));
+            pred.setDietaryType(info.dietaryType);
+            pred.setHealthNotes(info.healthNotes);
+            pred.setAiSource("ON_DEVICE_AI");
+        }
+        return pred;
     }
 
     private float[] extractVisualFeatures(Bitmap bitmap) {
