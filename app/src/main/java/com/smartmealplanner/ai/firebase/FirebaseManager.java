@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.smartmealplanner.ai.database.AppDatabase;
 import com.smartmealplanner.ai.database.entity.*;
 
 import java.util.HashMap;
@@ -181,10 +182,10 @@ public class FirebaseManager {
         firestore.collection("users").document(uid)
                  .collection("meals").document(meal.mealId)
                  .set(data, SetOptions.merge())
-                 .addOnSuccessListener(aVoid -> {
+                 .addOnSuccessListener(AppDatabase.databaseWriteExecutor, aVoid -> {
                      if (callback != null) callback.onSuccess();
                  })
-                 .addOnFailureListener(e -> {
+                 .addOnFailureListener(AppDatabase.databaseWriteExecutor, e -> {
                      if (callback != null) callback.onFailure(e);
                  });
     }
@@ -215,10 +216,10 @@ public class FirebaseManager {
 
         firestore.collection("users").document(profile.userId)
                  .set(data, SetOptions.merge())
-                 .addOnSuccessListener(aVoid -> {
+                 .addOnSuccessListener(AppDatabase.databaseWriteExecutor, aVoid -> {
                      if (callback != null) callback.onSuccess();
                  })
-                 .addOnFailureListener(e -> {
+                 .addOnFailureListener(AppDatabase.databaseWriteExecutor, e -> {
                      if (callback != null) callback.onFailure(e);
                  });
     }
@@ -240,10 +241,10 @@ public class FirebaseManager {
         firestore.collection("users").document(item.userId)
                  .collection("grocery").document(item.itemId)
                  .set(data, SetOptions.merge())
-                 .addOnSuccessListener(aVoid -> {
+                 .addOnSuccessListener(AppDatabase.databaseWriteExecutor, aVoid -> {
                      if (callback != null) callback.onSuccess();
                  })
-                 .addOnFailureListener(e -> {
+                 .addOnFailureListener(AppDatabase.databaseWriteExecutor, e -> {
                      if (callback != null) callback.onFailure(e);
                  });
     }
@@ -263,10 +264,10 @@ public class FirebaseManager {
         firestore.collection("users").document(state.userId)
                  .collection("recommendation_state").document(state.armId)
                  .set(data, SetOptions.merge())
-                 .addOnSuccessListener(aVoid -> {
+                 .addOnSuccessListener(AppDatabase.databaseWriteExecutor, aVoid -> {
                      if (callback != null) callback.onSuccess();
                  })
-                 .addOnFailureListener(e -> {
+                 .addOnFailureListener(AppDatabase.databaseWriteExecutor, e -> {
                      if (callback != null) callback.onFailure(e);
                  });
     }

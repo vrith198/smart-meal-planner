@@ -58,8 +58,12 @@ public class SyncWorker extends Worker {
                 firebaseManager.syncMealToCloud(meal, new FirebaseManager.SyncCallback() {
                     @Override
                     public void onSuccess() {
-                        db.loggedMealDao().markAsSynced(meal.mealId);
-                        latch.countDown();
+                        AppDatabase.databaseWriteExecutor.execute(() -> {
+                            try {
+                                db.loggedMealDao().markAsSynced(meal.mealId);
+                            } catch (Exception ignored) {}
+                            latch.countDown();
+                        });
                     }
 
                     @Override
@@ -78,8 +82,12 @@ public class SyncWorker extends Worker {
                 firebaseManager.syncProfileToCloud(profile, new FirebaseManager.SyncCallback() {
                     @Override
                     public void onSuccess() {
-                        db.userDao().markAsSynced(profile.userId);
-                        latch.countDown();
+                        AppDatabase.databaseWriteExecutor.execute(() -> {
+                            try {
+                                db.userDao().markAsSynced(profile.userId);
+                            } catch (Exception ignored) {}
+                            latch.countDown();
+                        });
                     }
 
                     @Override
@@ -97,8 +105,12 @@ public class SyncWorker extends Worker {
                 firebaseManager.syncGroceryToCloud(item, new FirebaseManager.SyncCallback() {
                     @Override
                     public void onSuccess() {
-                        db.groceryDao().markAsSynced(item.itemId);
-                        latch.countDown();
+                        AppDatabase.databaseWriteExecutor.execute(() -> {
+                            try {
+                                db.groceryDao().markAsSynced(item.itemId);
+                            } catch (Exception ignored) {}
+                            latch.countDown();
+                        });
                     }
 
                     @Override
@@ -116,8 +128,12 @@ public class SyncWorker extends Worker {
                 firebaseManager.syncUcbStateToCloud(state, new FirebaseManager.SyncCallback() {
                     @Override
                     public void onSuccess() {
-                        db.ucb1Dao().markAsSynced(state.armId, state.userId);
-                        latch.countDown();
+                        AppDatabase.databaseWriteExecutor.execute(() -> {
+                            try {
+                                db.ucb1Dao().markAsSynced(state.armId, state.userId);
+                            } catch (Exception ignored) {}
+                            latch.countDown();
+                        });
                     }
 
                     @Override

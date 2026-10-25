@@ -1,7 +1,10 @@
 package com.smartmealplanner.ai.ui.scan;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -20,9 +23,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.chip.Chip;
 import com.smartmealplanner.ai.R;
 import com.smartmealplanner.ai.database.AppDatabase;
 import com.smartmealplanner.ai.database.entity.FoodItemEntity;
@@ -30,6 +35,7 @@ import com.smartmealplanner.ai.ml.FoodClassifier;
 import com.smartmealplanner.ai.model.PredictionResult;
 import com.smartmealplanner.ai.ui.analysis.MealAnalysisActivity;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,11 +63,27 @@ public class ScanMealFragment extends Fragment {
 
     // Activity Result Launchers
     private ActivityResultLauncher<Void> cameraLauncher;
+    private ActivityResultLauncher<String> cameraPermissionLauncher;
     private ActivityResultLauncher<String> galleryLauncher;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        cameraPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                if (isGranted) {
+                    launchCamera();
+                } else {
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(),
+                            "Camera permission is required to capture meal photos. You can also pick from gallery or tap sample foods below.",
+                            Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        );
 
         cameraLauncher = registerForActivityResult(
             new ActivityResultContracts.TakePicturePreview(),
@@ -91,6 +113,40 @@ public class ScanMealFragment extends Fragment {
         );
     }
 
+    private void checkAndLaunchCamera() {
+        if (getContext() == null) return;
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            launchCamera();
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+        }
+    }
+
+    private void launchCamera() {
+        try {
+            cameraLauncher.launch(null);
+        } catch (Exception e) {
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "Could not open camera: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void loadSampleFood(String assetFileName) {
+        if (getContext() == null) return;
+        try (InputStream is = getContext().getAssets().open("sample_foods/" + assetFileName)) {
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            if (bitmap != null) {
+                processCapturedImage(bitmap);
+            } else {
+                Toast.makeText(getContext(), "Could not load sample meal image.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Failed to load sample: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private Bitmap decodeUriToBitmap(Uri uri) {
         if (getContext() == null || uri == null) return null;
         try {
@@ -101,7 +157,7 @@ public class ScanMealFragment extends Fragment {
                     decoder.setAllocator(android.graphics.ImageDecoder.ALLOCATOR_SOFTWARE);
                     int maxDim = Math.max(info.getSize().getWidth(), info.getSize().getHeight());
                     if (maxDim > 1024) {
-                        decoder.setTargetSampleSize(maxDim / 1024);
+                        decoder.setTargetSampleSize(Math.max(1, maxDim / 1024));
                     }
                 });
             } else {
@@ -150,8 +206,16 @@ public class ScanMealFragment extends Fragment {
         MaterialButton btnCapture = v.findViewById(R.id.btnCaptureCamera);
         MaterialButton btnGallery = v.findViewById(R.id.btnChooseGallery);
 
-        btnCapture.setOnClickListener(view -> cameraLauncher.launch(null));
+        btnCapture.setOnClickListener(view -> checkAndLaunchCamera());
         btnGallery.setOnClickListener(view -> galleryLauncher.launch("image/*"));
+
+        Chip chipPizza = v.findViewById(R.id.chipSamplePizza);
+        Chip chipSalad = v.findViewById(R.id.chipSampleSalad);
+        Chip chipFries = v.findViewById(R.id.chipSampleFries);
+
+        if (chipPizza != null) chipPizza.setOnClickListener(view -> loadSampleFood("pizza.jpg"));
+        if (chipSalad != null) chipSalad.setOnClickListener(view -> loadSampleFood("caesar_salad.jpg"));
+        if (chipFries != null) chipFries.setOnClickListener(view -> loadSampleFood("french_fries.jpg"));
 
         btnConfirmFood.setOnClickListener(view -> handleConfirmFood());
 
@@ -239,11 +303,24 @@ public class ScanMealFragment extends Fragment {
         }
 
         // Auto-select best match in correction spinner if available
+        boolean matched = false;
         for (int i = 0; i < allCatalogFoods.size(); i++) {
-            if (allCatalogFoods.get(i).classifierLabel != null &&
-                allCatalogFoods.get(i).classifierLabel.equalsIgnoreCase(p1.getLabel())) {
+            FoodItemEntity food = allCatalogFoods.get(i);
+            if (food.classifierLabel != null &&
+                food.classifierLabel.equalsIgnoreCase(p1.getLabel())) {
                 spinnerCorrection.setSelection(i);
+                matched = true;
                 break;
+            }
+        }
+        if (!matched) {
+            String cleanLabel = p1.getLabel().toLowerCase().replace("_", " ");
+            for (int i = 0; i < allCatalogFoods.size(); i++) {
+                FoodItemEntity food = allCatalogFoods.get(i);
+                if (food.name != null && (food.name.toLowerCase().contains(cleanLabel) || cleanLabel.contains(food.name.toLowerCase()))) {
+                    spinnerCorrection.setSelection(i);
+                    break;
+                }
             }
         }
     }
