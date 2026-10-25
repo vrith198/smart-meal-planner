@@ -13,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.smartmealplanner.ai.R;
@@ -23,6 +26,10 @@ import com.smartmealplanner.ai.firebase.FirebaseManager;
 import com.smartmealplanner.ai.model.NutritionSummary;
 import com.smartmealplanner.ai.model.ServingOption;
 import com.smartmealplanner.ai.nutrition.NutritionCalculator;
+import com.smartmealplanner.ai.ui.substitute.IngredientSubstituteBottomSheet;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -43,6 +50,8 @@ public class MealAnalysisActivity extends AppCompatActivity {
     private TextInputEditText etCustomGrams;
     private Spinner spinnerMealSlot;
     private MaterialButton btnSaveMeal;
+    private MaterialCardView cardIngredients;
+    private ChipGroup chipGroupIngredients;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +78,8 @@ public class MealAnalysisActivity extends AppCompatActivity {
         etCustomGrams = findViewById(R.id.etCustomGrams);
         spinnerMealSlot = findViewById(R.id.spinnerMealSlot);
         btnSaveMeal = findViewById(R.id.btnSaveMeal);
+        cardIngredients = findViewById(R.id.cardIngredients);
+        chipGroupIngredients = findViewById(R.id.chipGroupIngredients);
 
         setupMealSlotSpinner();
         setupServingToggle();
@@ -157,6 +168,7 @@ public class MealAnalysisActivity extends AppCompatActivity {
                     currentServingGrams = currentFood.mediumServingGrams > 0 ? currentFood.mediumServingGrams : 120;
                     tvServingDescription.setText(String.format(Locale.US, "Standard medium portion (%dg - %s)",
                             currentServingGrams, currentFood.servingUnitName != null ? currentFood.servingUnitName : "Serving"));
+                    setupIngredientsChips(currentFood.ingredientsJson);
                     recalculateNutrients();
                 } else {
                     Toast.makeText(this, "Food not found in catalog.", Toast.LENGTH_SHORT).show();
@@ -164,6 +176,52 @@ public class MealAnalysisActivity extends AppCompatActivity {
                 }
             });
         });
+    }
+
+    private void setupIngredientsChips(String ingredientsJson) {
+        if (ingredientsJson == null || ingredientsJson.trim().isEmpty()) {
+            if (cardIngredients != null) cardIngredients.setVisibility(View.GONE);
+            return;
+        }
+
+        try {
+            JSONArray array = new JSONArray(ingredientsJson);
+            if (array.length() == 0) {
+                if (cardIngredients != null) cardIngredients.setVisibility(View.GONE);
+                return;
+            }
+
+            if (cardIngredients != null) cardIngredients.setVisibility(View.VISIBLE);
+            if (chipGroupIngredients != null) {
+                chipGroupIngredients.removeAllViews();
+
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject ing = array.getJSONObject(i);
+                    String name = ing.getString("name");
+                    double amount = ing.optDouble("amount", 0);
+                    String unit = ing.optString("unit", "");
+
+                    Chip chip = new Chip(this);
+                    if (amount > 0) {
+                        chip.setText(String.format(Locale.US, "%s (%.0f %s)", name, amount, unit));
+                    } else {
+                        chip.setText(name);
+                    }
+                    chip.setChipIconResource(R.drawable.ic_swap_horiz);
+                    chip.setClickable(true);
+                    chip.setFocusable(true);
+                    chip.setOnClickListener(v -> {
+                        IngredientSubstituteBottomSheet sheet = IngredientSubstituteBottomSheet.newInstance(
+                                name, amount, unit, false, ""
+                        );
+                        sheet.show(getSupportFragmentManager(), "substitute_sheet");
+                    });
+                    chipGroupIngredients.addView(chip);
+                }
+            }
+        } catch (Exception e) {
+            if (cardIngredients != null) cardIngredients.setVisibility(View.GONE);
+        }
     }
 
     private void recalculateNutrients() {

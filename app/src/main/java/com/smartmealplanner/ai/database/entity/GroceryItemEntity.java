@@ -17,6 +17,11 @@ import androidx.room.PrimaryKey;
 )
 public class GroceryItemEntity {
 
+    public static final int SYNCED = 0;
+    public static final int PENDING_CREATE = 1;
+    public static final int PENDING_UPDATE = 2;
+    public static final int PENDING_DELETE = 3;
+
     @PrimaryKey
     @NonNull
     public String itemId; // UUID

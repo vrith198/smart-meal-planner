@@ -23,6 +23,7 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryAdapter.GroceryV
     public interface OnGroceryActionListener {
         void onToggle(GroceryItemEntity item, boolean isChecked);
         void onDelete(GroceryItemEntity item);
+        void onFindSubstitute(GroceryItemEntity item);
     }
 
     private List<GroceryItemEntity> items = new ArrayList<>();
@@ -75,6 +76,14 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryAdapter.GroceryV
         holder.btnDelete.setOnClickListener(v -> {
             if (listener != null) listener.onDelete(item);
         });
+
+        holder.btnSubstitute.setOnClickListener(v -> {
+            if (listener != null) listener.onFindSubstitute(item);
+        });
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onFindSubstitute(item);
+        });
     }
 
     @Override
@@ -85,7 +94,7 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryAdapter.GroceryV
     static class GroceryViewHolder extends RecyclerView.ViewHolder {
         CheckBox checkBox;
         TextView tvName, tvCategory, tvQuantity;
-        ImageView btnDelete;
+        ImageView btnSubstitute, btnDelete;
 
         GroceryViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -93,6 +102,7 @@ public class GroceryAdapter extends RecyclerView.Adapter<GroceryAdapter.GroceryV
             tvName = itemView.findViewById(R.id.tvGroceryName);
             tvCategory = itemView.findViewById(R.id.tvGroceryCategory);
             tvQuantity = itemView.findViewById(R.id.tvGroceryQuantity);
+            btnSubstitute = itemView.findViewById(R.id.btnSubstituteGrocery);
             btnDelete = itemView.findViewById(R.id.btnDeleteGrocery);
         }
     }

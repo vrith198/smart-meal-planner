@@ -24,6 +24,8 @@ import com.smartmealplanner.ai.database.entity.FoodItemEntity;
 import com.smartmealplanner.ai.database.entity.GroceryItemEntity;
 import com.smartmealplanner.ai.database.entity.MealPlanEntity;
 import com.smartmealplanner.ai.firebase.FirebaseManager;
+import com.smartmealplanner.ai.model.SubstituteOption;
+import com.smartmealplanner.ai.ui.substitute.IngredientSubstituteBottomSheet;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -244,5 +246,34 @@ public class GroceryFragment extends Fragment implements GroceryAdapter.OnGrocer
         AppDatabase.databaseWriteExecutor.execute(() -> {
             db.groceryDao().delete(item);
         });
+    }
+
+    @Override
+    public void onFindSubstitute(GroceryItemEntity item) {
+        if (getContext() == null || item == null) return;
+        IngredientSubstituteBottomSheet sheet = IngredientSubstituteBottomSheet.newInstance(
+                item.ingredientName,
+                item.quantity,
+                item.unit,
+                true,
+                item.itemId
+        );
+        sheet.setOnSubstituteSelectedListener((targetId, originalIngredient, chosenSubstitute) -> {
+            AppDatabase db = AppDatabase.getInstance(getContext());
+            item.ingredientName = chosenSubstitute.getName();
+            item.syncState = GroceryItemEntity.PENDING_UPDATE;
+            item.updatedAtMs = System.currentTimeMillis();
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                db.groceryDao().update(item);
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(),
+                                "Replaced \"" + originalIngredient + "\" with \"" + chosenSubstitute.getName() + "\"",
+                                Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
+        });
+        sheet.show(getChildFragmentManager(), "substitute_sheet");
     }
 }
