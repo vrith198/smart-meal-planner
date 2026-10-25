@@ -17,6 +17,12 @@ public class PredictionResult {
     private String servingUnit = "1 Serving";
     private String foodId = "";
 
+    // Multimodal AI Agent fields
+    private java.util.List<String> ingredients = new java.util.ArrayList<>();
+    private String healthNotes = "";
+    private String dietaryType = "";
+    private String aiSource = "ON_DEVICE"; // "ON_DEVICE" or "GEMINI_AGENT"
+
     public PredictionResult(String label, String displayName, float confidence) {
         this.label = label;
         this.displayName = displayName;
@@ -103,6 +109,42 @@ public class PredictionResult {
 
     public void setFoodId(String foodId) {
         this.foodId = foodId;
+    }
+
+    public java.util.List<String> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(java.util.List<String> ingredients) {
+        this.ingredients = ingredients != null ? ingredients : new java.util.ArrayList<>();
+    }
+
+    public String getHealthNotes() {
+        return healthNotes;
+    }
+
+    public void setHealthNotes(String healthNotes) {
+        this.healthNotes = healthNotes != null ? healthNotes : "";
+    }
+
+    public String getDietaryType() {
+        return dietaryType;
+    }
+
+    public void setDietaryType(String dietaryType) {
+        this.dietaryType = dietaryType != null ? dietaryType : "";
+    }
+
+    public String getAiSource() {
+        return aiSource;
+    }
+
+    public void setAiSource(String aiSource) {
+        this.aiSource = aiSource != null ? aiSource : "ON_DEVICE";
+    }
+
+    public boolean isGeminiResult() {
+        return "GEMINI_AGENT".equalsIgnoreCase(aiSource);
     }
 
     @Override

@@ -32,9 +32,13 @@ import com.smartmealplanner.ai.R;
 import com.smartmealplanner.ai.database.AppDatabase;
 import com.smartmealplanner.ai.database.entity.FoodItemEntity;
 import com.smartmealplanner.ai.ml.FoodClassifier;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.smartmealplanner.ai.agent.GeminiVisionAgent;
 import com.smartmealplanner.ai.model.PredictionResult;
 import com.smartmealplanner.ai.ui.analysis.MealAnalysisActivity;
 
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,12 +52,21 @@ public class ScanMealFragment extends Fragment {
 
     // AI Calorie Estimation Card Views
     private View cardAiCalorieEstimate;
+    private TextView tvAiSourceBadge;
     private TextView tvAiDetectedFoodName;
     private TextView tvAiConfidenceBadge;
     private TextView tvAiEstimatedCalories;
     private TextView tvAiServingDesc;
     private TextView tvAiMacroProtein, tvAiMacroCarbs, tvAiMacroFat;
+    private TextView tvAiIngredients, tvAiHealthNotes;
     private MaterialButton btnQuickLogMeal;
+
+    // Gemini Multimodal Vision Agent Views
+    private View layoutGeminiAgentRow;
+    private MaterialButton btnAnalyzeWithGemini;
+    private MaterialButton btnGeminiKeySettings;
+    private View layoutGeminiLoading;
+    private TextView tvGeminiLoadingStatus;
 
     private TextView tvPred1Name, tvPred1Conf;
     private ProgressBar pbPred1;
@@ -67,6 +80,8 @@ public class ScanMealFragment extends Fragment {
     private MaterialButton btnConfirmFood;
 
     private FoodClassifier foodClassifier;
+    private GeminiVisionAgent geminiVisionAgent;
+    private Bitmap currentBitmap;
     private List<FoodItemEntity> allCatalogFoods = new ArrayList<>();
     private List<PredictionResult> currentPredictions = new ArrayList<>();
 
@@ -209,6 +224,7 @@ public class ScanMealFragment extends Fragment {
         pbPred3 = v.findViewById(R.id.pbPred3);
 
         cardAiCalorieEstimate = v.findViewById(R.id.cardAiCalorieEstimate);
+        tvAiSourceBadge = v.findViewById(R.id.tvAiSourceBadge);
         tvAiDetectedFoodName = v.findViewById(R.id.tvAiDetectedFoodName);
         tvAiConfidenceBadge = v.findViewById(R.id.tvAiConfidenceBadge);
         tvAiEstimatedCalories = v.findViewById(R.id.tvAiEstimatedCalories);
@@ -216,7 +232,18 @@ public class ScanMealFragment extends Fragment {
         tvAiMacroProtein = v.findViewById(R.id.tvAiMacroProtein);
         tvAiMacroCarbs = v.findViewById(R.id.tvAiMacroCarbs);
         tvAiMacroFat = v.findViewById(R.id.tvAiMacroFat);
+        tvAiIngredients = v.findViewById(R.id.tvAiIngredients);
+        tvAiHealthNotes = v.findViewById(R.id.tvAiHealthNotes);
         btnQuickLogMeal = v.findViewById(R.id.btnQuickLogMeal);
+
+        layoutGeminiAgentRow = v.findViewById(R.id.layoutGeminiAgentRow);
+        btnAnalyzeWithGemini = v.findViewById(R.id.btnAnalyzeWithGemini);
+        btnGeminiKeySettings = v.findViewById(R.id.btnGeminiKeySettings);
+        layoutGeminiLoading = v.findViewById(R.id.layoutGeminiLoading);
+        tvGeminiLoadingStatus = v.findViewById(R.id.tvGeminiLoadingStatus);
+
+        btnAnalyzeWithGemini.setOnClickListener(view -> onAnalyzeWithGeminiClicked());
+        btnGeminiKeySettings.setOnClickListener(view -> showApiKeyInputDialog(null));
 
         tvLowConfidenceWarning = v.findViewById(R.id.tvLowConfidenceWarning);
         spinnerCorrection = v.findViewById(R.id.spinnerFoodCorrection);
@@ -238,8 +265,9 @@ public class ScanMealFragment extends Fragment {
 
         btnConfirmFood.setOnClickListener(view -> handleConfirmFood());
 
-        // Initialize food classifier
+        // Initialize food classifier and Gemini Vision Agent
         foodClassifier = new FoodClassifier(getContext());
+        geminiVisionAgent = new GeminiVisionAgent();
 
         // Load catalog foods in background for correction spinner
         loadCatalogFoods();
@@ -268,10 +296,12 @@ public class ScanMealFragment extends Fragment {
     }
 
     private void processCapturedImage(Bitmap bitmap) {
+        this.currentBitmap = bitmap;
         ivPreview.setImageBitmap(bitmap);
         layoutEmptyPreview.setVisibility(View.GONE);
         pbInference.setVisibility(View.VISIBLE);
         layoutPredictions.setVisibility(View.GONE);
+        layoutGeminiLoading.setVisibility(View.GONE);
 
         // Run local inference in background thread
         AppDatabase.databaseWriteExecutor.execute(() -> {
@@ -298,6 +328,7 @@ public class ScanMealFragment extends Fragment {
         // Bind AI Calorie Estimation Card
         if (cardAiCalorieEstimate != null) {
             cardAiCalorieEstimate.setVisibility(View.VISIBLE);
+            if (tvAiSourceBadge != null) tvAiSourceBadge.setText("📱 On-Device AI");
             tvAiDetectedFoodName.setText(p1.getDisplayName());
             tvAiConfidenceBadge.setText(p1.getConfidencePercentage() + "% Match");
             tvAiEstimatedCalories.setText("🔥 " + p1.getCalories() + " kcal");
@@ -305,6 +336,12 @@ public class ScanMealFragment extends Fragment {
             tvAiMacroProtein.setText("Protein: " + p1.getProtein() + "g");
             tvAiMacroCarbs.setText("Carbs: " + p1.getCarbs() + "g");
             tvAiMacroFat.setText("Fat: " + p1.getFat() + "g");
+
+            if (tvAiIngredients != null) tvAiIngredients.setVisibility(View.GONE);
+            if (tvAiHealthNotes != null) tvAiHealthNotes.setVisibility(View.GONE);
+            if (btnAnalyzeWithGemini != null) btnAnalyzeWithGemini.setEnabled(true);
+            if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
+
             btnQuickLogMeal.setText("⚡ Log " + p1.getDisplayName() + " (" + p1.getCalories() + " kcal)");
             btnQuickLogMeal.setOnClickListener(view -> handleQuickLog(p1));
         }
@@ -369,6 +406,151 @@ public class ScanMealFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "Please select a food item to continue", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void onAnalyzeWithGeminiClicked() {
+        if (currentBitmap == null) {
+            Toast.makeText(getContext(), "Please capture or choose a meal photo first.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!GeminiVisionAgent.hasApiKey(getContext())) {
+            showApiKeyInputDialog(this::triggerGeminiAnalysis);
+        } else {
+            triggerGeminiAnalysis();
+        }
+    }
+
+    private void triggerGeminiAnalysis() {
+        if (currentBitmap == null || getContext() == null) return;
+
+        if (layoutGeminiLoading != null) {
+            layoutGeminiLoading.setVisibility(View.VISIBLE);
+        }
+        if (btnAnalyzeWithGemini != null) {
+            btnAnalyzeWithGemini.setEnabled(false);
+        }
+
+        geminiVisionAgent.analyzeMealPhoto(getContext(), currentBitmap, new GeminiVisionAgent.AgentCallback() {
+            @Override
+            public void onSuccess(PredictionResult result) {
+                if (getActivity() == null) return;
+                if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
+                if (btnAnalyzeWithGemini != null) btnAnalyzeWithGemini.setEnabled(true);
+                displayGeminiPrediction(result);
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                if (getActivity() == null) return;
+                if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
+                if (btnAnalyzeWithGemini != null) btnAnalyzeWithGemini.setEnabled(true);
+
+                if ("API_KEY_REQUIRED".equals(errorMessage)) {
+                    showApiKeyInputDialog(ScanMealFragment.this::triggerGeminiAnalysis);
+                } else {
+                    Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    private void displayGeminiPrediction(PredictionResult p) {
+        if (cardAiCalorieEstimate != null) {
+            cardAiCalorieEstimate.setVisibility(View.VISIBLE);
+            if (tvAiSourceBadge != null) tvAiSourceBadge.setText("✨ Gemini Vision Agent");
+            tvAiDetectedFoodName.setText(p.getDisplayName());
+            tvAiConfidenceBadge.setText(p.getConfidencePercentage() + "% Match");
+            tvAiEstimatedCalories.setText("🔥 " + p.getCalories() + " kcal");
+            tvAiServingDesc.setText("(" + p.getServingUnit() + ")");
+            tvAiMacroProtein.setText("Protein: " + Math.round(p.getProtein()) + "g");
+            tvAiMacroCarbs.setText("Carbs: " + Math.round(p.getCarbs()) + "g");
+            tvAiMacroFat.setText("Fat: " + Math.round(p.getFat()) + "g");
+
+            if (p.getIngredients() != null && !p.getIngredients().isEmpty()) {
+                if (tvAiIngredients != null) {
+                    tvAiIngredients.setText("🥗 Ingredients: " + joinStrings(p.getIngredients(), ", "));
+                    tvAiIngredients.setVisibility(View.VISIBLE);
+                }
+            } else {
+                if (tvAiIngredients != null) tvAiIngredients.setVisibility(View.GONE);
+            }
+
+            if (p.getHealthNotes() != null && !p.getHealthNotes().isEmpty()) {
+                if (tvAiHealthNotes != null) {
+                    tvAiHealthNotes.setText("💡 " + p.getHealthNotes());
+                    tvAiHealthNotes.setVisibility(View.VISIBLE);
+                }
+            } else {
+                if (tvAiHealthNotes != null) tvAiHealthNotes.setVisibility(View.GONE);
+            }
+
+            btnQuickLogMeal.setText("⚡ Log " + p.getDisplayName() + " (" + p.getCalories() + " kcal)");
+            btnQuickLogMeal.setOnClickListener(view -> handleQuickLog(p));
+        }
+
+        Toast.makeText(getContext(), "✨ Gemini Vision Agent analyzed " + p.getDisplayName() + " (" + p.getCalories() + " kcal)!", Toast.LENGTH_LONG).show();
+    }
+
+    private void showApiKeyInputDialog(@Nullable Runnable onKeySaved) {
+        if (getContext() == null) return;
+
+        final EditText input = new EditText(getContext());
+        input.setSingleLine(true);
+        input.setHint("AIzaSy...");
+        String existingKey = GeminiVisionAgent.getApiKey(getContext());
+        if (existingKey != null && !existingKey.isEmpty()) {
+            input.setText(existingKey);
+            input.setSelection(existingKey.length());
+        }
+
+        FrameLayout container = new FrameLayout(getContext());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        int marginPx = (int) (20 * getResources().getDisplayMetrics().density);
+        params.leftMargin = marginPx;
+        params.rightMargin = marginPx;
+        params.topMargin = marginPx / 2;
+        params.bottomMargin = marginPx / 2;
+        input.setLayoutParams(params);
+        container.addView(input);
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Google Gemini Vision API Key")
+                .setMessage("Enter your Gemini API key to enable multimodal AI vision analysis for arbitrary meal photos.\n(Get a free key from aistudio.google.com)")
+                .setView(container)
+                .setPositiveButton("Save & Use", (dialog, which) -> {
+                    String entered = input.getText().toString().trim();
+                    if (!entered.isEmpty()) {
+                        GeminiVisionAgent.setApiKey(getContext(), entered);
+                        Toast.makeText(getContext(), "Gemini API Key saved!", Toast.LENGTH_SHORT).show();
+                        if (onKeySaved != null) {
+                            onKeySaved.run();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "API Key cannot be empty.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", null);
+
+        if (existingKey != null && !existingKey.isEmpty()) {
+            builder.setNeutralButton("Clear Key", (dialog, which) -> {
+                GeminiVisionAgent.clearApiKey(getContext());
+                Toast.makeText(getContext(), "Gemini API Key removed.", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        builder.show();
+    }
+
+    private String joinStrings(List<String> list, String delimiter) {
+        if (list == null || list.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            sb.append(list.get(i));
+            if (i < list.size() - 1) sb.append(delimiter);
+        }
+        return sb.toString();
     }
 
     private void handleQuickLog(PredictionResult p) {

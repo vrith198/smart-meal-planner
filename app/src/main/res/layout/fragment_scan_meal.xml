@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:clipToPadding="false"
+    android:paddingBottom="120dp"
     android:background="@color/background">
 
     <LinearLayout
@@ -210,6 +212,20 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvAiSourceBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/item_logged_meal"
+                            android:paddingStart="6dp"
+                            android:paddingEnd="6dp"
+                            android:paddingTop="3dp"
+                            android:paddingBottom="3dp"
+                            android:text="📱 On-Device"
+                            android:textColor="@color/on_surface_variant"
+                            android:textSize="11sp" />
+
+                        <TextView
                             android:id="@+id/tvAiConfidenceBadge"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -298,6 +314,27 @@
                             android:textSize="12sp" />
                     </LinearLayout>
 
+                    <!-- Ingredients & Health Insights -->
+                    <TextView
+                        android:id="@+id/tvAiIngredients"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Ingredients: Tomato, Cheese, Basil"
+                        android:textColor="@color/on_surface_variant"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvAiHealthNotes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="💡 Rich in protein and calcium."
+                        android:textColor="@color/primary"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
                     <!-- Quick Log Button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnQuickLogMeal"
@@ -305,6 +342,60 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
                         android:text="⚡ Log This Meal (532 kcal)" />
+
+                    <!-- Gemini Multimodal Vision Agent Action Row -->
+                    <LinearLayout
+                        android:id="@+id/layoutGeminiAgentRow"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnAnalyzeWithGemini"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="✨ Analyze with Gemini Vision"
+                            android:textSize="12sp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnGeminiKeySettings"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="🔑 Key"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Gemini Loading Indicator -->
+                    <LinearLayout
+                        android:id="@+id/layoutGeminiLoading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <ProgressBar
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:indeterminate="true" />
+
+                        <TextView
+                            android:id="@+id/tvGeminiLoadingStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:text="✨ Gemini Vision Agent analyzing meal..."
+                            android:textColor="@color/primary"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
