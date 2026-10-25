@@ -46,6 +46,15 @@ public class ScanMealFragment extends Fragment {
     private ProgressBar pbInference;
     private LinearLayout layoutPredictions;
 
+    // AI Calorie Estimation Card Views
+    private View cardAiCalorieEstimate;
+    private TextView tvAiDetectedFoodName;
+    private TextView tvAiConfidenceBadge;
+    private TextView tvAiEstimatedCalories;
+    private TextView tvAiServingDesc;
+    private TextView tvAiMacroProtein, tvAiMacroCarbs, tvAiMacroFat;
+    private MaterialButton btnQuickLogMeal;
+
     private TextView tvPred1Name, tvPred1Conf;
     private ProgressBar pbPred1;
     private TextView tvPred2Name, tvPred2Conf;
@@ -199,6 +208,16 @@ public class ScanMealFragment extends Fragment {
         tvPred3Conf = v.findViewById(R.id.tvPred3Conf);
         pbPred3 = v.findViewById(R.id.pbPred3);
 
+        cardAiCalorieEstimate = v.findViewById(R.id.cardAiCalorieEstimate);
+        tvAiDetectedFoodName = v.findViewById(R.id.tvAiDetectedFoodName);
+        tvAiConfidenceBadge = v.findViewById(R.id.tvAiConfidenceBadge);
+        tvAiEstimatedCalories = v.findViewById(R.id.tvAiEstimatedCalories);
+        tvAiServingDesc = v.findViewById(R.id.tvAiServingDesc);
+        tvAiMacroProtein = v.findViewById(R.id.tvAiMacroProtein);
+        tvAiMacroCarbs = v.findViewById(R.id.tvAiMacroCarbs);
+        tvAiMacroFat = v.findViewById(R.id.tvAiMacroFat);
+        btnQuickLogMeal = v.findViewById(R.id.btnQuickLogMeal);
+
         tvLowConfidenceWarning = v.findViewById(R.id.tvLowConfidenceWarning);
         spinnerCorrection = v.findViewById(R.id.spinnerFoodCorrection);
         btnConfirmFood = v.findViewById(R.id.btnConfirmFood);
@@ -273,16 +292,31 @@ public class ScanMealFragment extends Fragment {
             return;
         }
 
-        // Top 1
+        // Top 1 Primary Detection
         PredictionResult p1 = predictions.get(0);
-        tvPred1Name.setText("1. " + p1.getDisplayName());
+
+        // Bind AI Calorie Estimation Card
+        if (cardAiCalorieEstimate != null) {
+            cardAiCalorieEstimate.setVisibility(View.VISIBLE);
+            tvAiDetectedFoodName.setText(p1.getDisplayName());
+            tvAiConfidenceBadge.setText(p1.getConfidencePercentage() + "% Match");
+            tvAiEstimatedCalories.setText("🔥 " + p1.getCalories() + " kcal");
+            tvAiServingDesc.setText("(" + p1.getServingUnit() + ")");
+            tvAiMacroProtein.setText("Protein: " + p1.getProtein() + "g");
+            tvAiMacroCarbs.setText("Carbs: " + p1.getCarbs() + "g");
+            tvAiMacroFat.setText("Fat: " + p1.getFat() + "g");
+            btnQuickLogMeal.setText("⚡ Log " + p1.getDisplayName() + " (" + p1.getCalories() + " kcal)");
+            btnQuickLogMeal.setOnClickListener(view -> handleQuickLog(p1));
+        }
+
+        tvPred1Name.setText("1. " + p1.getDisplayName() + " (" + p1.getCalories() + " kcal)");
         tvPred1Conf.setText(p1.getConfidencePercentage() + "%");
         pbPred1.setProgress(p1.getConfidencePercentage());
 
         // Top 2
         if (predictions.size() > 1) {
             PredictionResult p2 = predictions.get(1);
-            tvPred2Name.setText("2. " + p2.getDisplayName());
+            tvPred2Name.setText("2. " + p2.getDisplayName() + " (" + p2.getCalories() + " kcal)");
             tvPred2Conf.setText(p2.getConfidencePercentage() + "%");
             pbPred2.setProgress(p2.getConfidencePercentage());
         }
@@ -290,7 +324,7 @@ public class ScanMealFragment extends Fragment {
         // Top 3
         if (predictions.size() > 2) {
             PredictionResult p3 = predictions.get(2);
-            tvPred3Name.setText("3. " + p3.getDisplayName());
+            tvPred3Name.setText("3. " + p3.getDisplayName() + " (" + p3.getCalories() + " kcal)");
             tvPred3Conf.setText(p3.getConfidencePercentage() + "%");
             pbPred3.setProgress(p3.getConfidencePercentage());
         }
@@ -335,6 +369,63 @@ public class ScanMealFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "Please select a food item to continue", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void handleQuickLog(PredictionResult p) {
+        if (getContext() == null || p == null) return;
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            try {
+                AppDatabase db = AppDatabase.getInstance(requireContext());
+                String userId = com.smartmealplanner.ai.firebase.FirebaseManager.getInstance(requireContext()).getCurrentUserId();
+                if (userId == null || userId.isEmpty()) {
+                    com.smartmealplanner.ai.database.entity.UserProfileEntity profile = db.userDao().getAnyUserProfileSync();
+                    userId = profile != null ? profile.userId : "local_user";
+                }
+
+                String mealSlot = determineMealSlot();
+                String dateStr = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date());
+
+                com.smartmealplanner.ai.database.entity.LoggedMealEntity meal = new com.smartmealplanner.ai.database.entity.LoggedMealEntity(
+                    java.util.UUID.randomUUID().toString(),
+                    userId,
+                    p.getFoodId(),
+                    p.getDisplayName(),
+                    mealSlot,
+                    "MEDIUM",
+                    200,
+                    p.getCalories(),
+                    p.getProtein(),
+                    p.getCarbs(),
+                    p.getFat(),
+                    System.currentTimeMillis(),
+                    dateStr,
+                    com.smartmealplanner.ai.database.entity.LoggedMealEntity.PENDING_CREATE,
+                    System.currentTimeMillis()
+                );
+
+                db.loggedMealDao().insert(meal);
+
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "✅ Logged " + p.getDisplayName() + " (" + p.getCalories() + " kcal) to Dashboard!", Toast.LENGTH_LONG).show();
+                    });
+                }
+            } catch (Exception e) {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Error logging meal: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+        });
+    }
+
+    private String determineMealSlot() {
+        int hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY);
+        if (hour >= 6 && hour < 11) return "BREAKFAST";
+        if (hour >= 11 && hour < 16) return "LUNCH";
+        if (hour >= 16 && hour < 19) return "SNACK";
+        return "DINNER";
     }
 
     @Override
