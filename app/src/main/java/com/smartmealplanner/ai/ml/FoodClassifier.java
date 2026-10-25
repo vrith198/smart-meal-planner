@@ -67,6 +67,46 @@ public class FoodClassifier {
         0.1412f, 0.1255f, 0.0667f, 0.2941f, 0.2235f, 0.1451f, 0.2706f, 0.2000f, 0.1294f, 0.2431f, 0.1922f, 0.1647f
     };
 
+    private static final float[] VEC_BURGER = new float[]{
+        0.5210f, 0.4050f, 0.2980f, 0.0780f, 0.4210f, 0.3520f,
+        0.6520f, 0.4610f, 0.3200f, 0.7020f, 0.4950f, 0.3410f, 0.6880f, 0.4820f, 0.3320f, 0.6410f, 0.4500f, 0.3100f,
+        0.4200f, 0.5100f, 0.2750f, 0.4600f, 0.5400f, 0.2900f, 0.4800f, 0.5200f, 0.2800f, 0.4300f, 0.4800f, 0.2600f,
+        0.5600f, 0.4100f, 0.2100f, 0.6200f, 0.4400f, 0.2200f, 0.6000f, 0.4300f, 0.2150f, 0.5400f, 0.3900f, 0.2000f,
+        0.3900f, 0.2850f, 0.2050f, 0.4400f, 0.3150f, 0.2250f, 0.4300f, 0.3100f, 0.2200f, 0.3800f, 0.2750f, 0.1950f
+    };
+
+    private static final float[] VEC_ROTI = new float[]{
+        0.5650f, 0.4620f, 0.3680f, 0.0000f, 0.4800f, 0.3200f,
+        0.5800f, 0.4750f, 0.3800f, 0.5900f, 0.4850f, 0.3900f, 0.5850f, 0.4800f, 0.3850f, 0.5700f, 0.4650f, 0.3700f,
+        0.5600f, 0.4550f, 0.3600f, 0.5750f, 0.4700f, 0.3750f, 0.5700f, 0.4650f, 0.3700f, 0.5550f, 0.4500f, 0.3550f,
+        0.5500f, 0.4450f, 0.3500f, 0.5650f, 0.4600f, 0.3650f, 0.5600f, 0.4550f, 0.3600f, 0.5450f, 0.4400f, 0.3450f,
+        0.5300f, 0.4250f, 0.3300f, 0.5400f, 0.4350f, 0.3400f, 0.5350f, 0.4300f, 0.3350f, 0.5200f, 0.4150f, 0.3200f
+    };
+
+    private static final float[] VEC_DAL = new float[]{
+        0.6200f, 0.4850f, 0.2100f, 0.0000f, 0.5200f, 0.6500f,
+        0.5900f, 0.4600f, 0.2000f, 0.6300f, 0.4900f, 0.2150f, 0.6400f, 0.5000f, 0.2200f, 0.6000f, 0.4700f, 0.2050f,
+        0.6100f, 0.4800f, 0.2100f, 0.6500f, 0.5100f, 0.2250f, 0.6450f, 0.5050f, 0.2200f, 0.6150f, 0.4850f, 0.2100f,
+        0.6000f, 0.4700f, 0.2050f, 0.6400f, 0.5000f, 0.2200f, 0.6350f, 0.4950f, 0.2150f, 0.6050f, 0.4750f, 0.2050f,
+        0.5800f, 0.4500f, 0.1950f, 0.6100f, 0.4800f, 0.2100f, 0.6050f, 0.4750f, 0.2050f, 0.5750f, 0.4450f, 0.1900f
+    };
+
+    private static final float[] VEC_RICE = new float[]{
+        0.7800f, 0.7700f, 0.7400f, 0.0000f, 0.1500f, 0.1500f,
+        0.7600f, 0.7500f, 0.7200f, 0.7900f, 0.7800f, 0.7500f, 0.8000f, 0.7900f, 0.7600f, 0.7700f, 0.7600f, 0.7300f,
+        0.7700f, 0.7600f, 0.7300f, 0.8100f, 0.8000f, 0.7700f, 0.8050f, 0.7950f, 0.7650f, 0.7750f, 0.7650f, 0.7350f,
+        0.7650f, 0.7550f, 0.7250f, 0.8000f, 0.7900f, 0.7600f, 0.7950f, 0.7850f, 0.7550f, 0.7650f, 0.7550f, 0.7250f,
+        0.7500f, 0.7400f, 0.7100f, 0.7800f, 0.7700f, 0.7400f, 0.7750f, 0.7650f, 0.7350f, 0.7450f, 0.7350f, 0.7050f
+    };
+
+    private static final float[] VEC_SAMOSA = new float[]{
+        0.5800f, 0.4100f, 0.2300f, 0.0000f, 0.6200f, 0.4800f,
+        0.5200f, 0.3700f, 0.2100f, 0.6000f, 0.4300f, 0.2400f, 0.6100f, 0.4400f, 0.2500f, 0.5400f, 0.3800f, 0.2200f,
+        0.5500f, 0.3900f, 0.2200f, 0.6300f, 0.4500f, 0.2600f, 0.6200f, 0.4400f, 0.2500f, 0.5600f, 0.4000f, 0.2300f,
+        0.5400f, 0.3800f, 0.2100f, 0.6100f, 0.4300f, 0.2400f, 0.6000f, 0.4200f, 0.2300f, 0.5300f, 0.3700f, 0.2000f,
+        0.4800f, 0.3400f, 0.1900f, 0.5500f, 0.3900f, 0.2200f, 0.5400f, 0.3800f, 0.2100f, 0.4700f, 0.3300f, 0.1800f
+    };
+
     public static class NutritionInfo {
         public String id;
         public String name;
@@ -264,17 +304,27 @@ public class FoodClassifier {
     private List<PredictionResult> classifyByVisualFeatures(float[] vec, int topK) {
         List<PredictionResult> candidates = new ArrayList<>();
 
-        // 1. Distances to reference staples
+        // 1. Distances to all calibrated food vectors (fair, symmetric)
         float distPizza = calculateDistance(vec, VEC_PIZZA);
         float distSalad = calculateDistance(vec, VEC_SALAD);
         float distFries = calculateDistance(vec, VEC_FRIES);
+        float distBurger = calculateDistance(vec, VEC_BURGER);
+        float distRoti = calculateDistance(vec, VEC_ROTI);
+        float distDal = calculateDistance(vec, VEC_DAL);
+        float distRice = calculateDistance(vec, VEC_RICE);
+        float distSamosa = calculateDistance(vec, VEC_SAMOSA);
 
-        // Compute affinities
-        float ap = 1.0f / ((distPizza + 0.008f) * (distPizza + 0.008f));
-        float as_ = 1.0f / ((distSalad + 0.008f) * (distSalad + 0.008f));
-        float af = 1.0f / ((distFries + 0.008f) * (distFries + 0.008f));
+        // Compute base affinities from inverse distance squared
+        float ap = 1.0f / ((distPizza + 0.015f) * (distPizza + 0.015f));
+        float as_ = 1.0f / ((distSalad + 0.015f) * (distSalad + 0.015f));
+        float af = 1.0f / ((distFries + 0.015f) * (distFries + 0.015f));
+        float aBurger = 1.0f / ((distBurger + 0.015f) * (distBurger + 0.015f));
+        float aRoti = 1.0f / ((distRoti + 0.015f) * (distRoti + 0.015f));
+        float aDal = 1.0f / ((distDal + 0.015f) * (distDal + 0.015f));
+        float aRice = 1.0f / ((distRice + 0.015f) * (distRice + 0.015f));
+        float aSamosa = 1.0f / ((distSamosa + 0.015f) * (distSamosa + 0.015f));
 
-        // Color feature heuristics
+        // Color feature metrics
         float rMean = vec[0];
         float gMean = vec[1];
         float bMean = vec[2];
@@ -282,46 +332,81 @@ public class FoodClassifier {
         float redness = vec[4];
         float yellowness = vec[5];
 
-        // Specific food profile boosts
-        float aBurger = 0.05f;
-        float aSamosa = 0.05f;
-        float aDal = 0.05f;
-        float aRoti = 0.05f;
-        float aRice = 0.05f;
+        // 2. Spatial band stratification (Row 0: Top, Rows 1-2: Mid, Row 3: Bottom)
+        float topR = (vec[6] + vec[9] + vec[12] + vec[15]) / 4.0f;
+        float topG = (vec[7] + vec[10] + vec[13] + vec[16]) / 4.0f;
+        float topB = (vec[8] + vec[11] + vec[14] + vec[17]) / 4.0f;
 
-        // If green leafy tones are dominant -> salad boost
-        if (greenness > 0.05f || (gMean > rMean && gMean > bMean)) {
-            as_ *= 2.5f;
+        float midR = (vec[18] + vec[21] + vec[24] + vec[27] + vec[30] + vec[33] + vec[36] + vec[39]) / 8.0f;
+        float midG = (vec[19] + vec[22] + vec[25] + vec[28] + vec[31] + vec[34] + vec[37] + vec[40]) / 8.0f;
+        float midB = (vec[20] + vec[23] + vec[26] + vec[29] + vec[32] + vec[35] + vec[38] + vec[41]) / 8.0f;
+
+        float botR = (vec[42] + vec[45] + vec[48] + vec[51]) / 4.0f;
+        float botG = (vec[43] + vec[46] + vec[49] + vec[52]) / 4.0f;
+        float botB = (vec[44] + vec[47] + vec[50] + vec[53]) / 4.0f;
+
+        // 3. Autonomous Structural Inspection:
+        // A. Stacked Burger / Sandwich:
+        // Top is golden bread bun (warm, non-green), Mid has colorful fillings (lettuce, cheese, tomato), Bottom has dark patty
+        boolean hasTopBun = (topR > 0.40f && topR > topG && topG > topB && topG < topR * 0.95f);
+        boolean hasMidFillings = (greenness > 0.03f || yellowness > 0.15f || (midG > topG * 0.90f && midR > 0.35f));
+        boolean hasPattyBelow = (botR < topR * 1.05f || (botR > botG && botG > botB));
+
+        if (hasTopBun && hasMidFillings && hasPattyBelow && greenness < 0.35f) {
+            aBurger *= 15.0f;
+            as_ *= 0.05f; // Suppress salad false-positive on burger lettuce
         }
-        // If golden / fried yellow crust -> fries boost
-        if (yellowness > 0.18f && redness > 0.65f) {
-            af *= 2.5f;
-            aSamosa = 0.25f;
+
+        // B. Caesar / Leafy Salad:
+        // Leaves distributed on top and throughout; lacks a top bread bun
+        if ((topG > topR * 0.92f && greenness > 0.05f) || (greenness > 0.22f && !hasTopBun)) {
+            as_ *= 6.0f;
+            aBurger *= 0.05f;
         }
-        // If reddish baked crust / tomato -> pizza boost
-        if (redness > 0.45f && rMean > 0.50f) {
-            ap *= 2.5f;
-            aBurger = 0.18f;
+
+        // C. French Fries:
+        // Uniform golden yellow strips, high yellowness, minimal green
+        if (yellowness > 0.22f && redness > 0.50f && greenness < 0.03f && bMean < 0.28f) {
+            af *= 8.0f;
+            aSamosa *= 3.0f;
         }
-        // If bright yellow turmeric -> dal / curry
-        if (rMean > 0.52f && gMean > 0.42f && bMean < 0.28f) {
-            aDal = 0.85f;
+
+        // D. Pizza:
+        // Flat surface with melted cheese, high redness and yellowness throughout, circular crust perimeter
+        if (redness > 0.35f && yellowness > 0.15f && rMean > 0.48f && !hasTopBun) {
+            ap *= 5.0f;
         }
-        // If high white brightness -> rice / idli
+
+        // E. Steamed Rice:
+        // High overall white brightness
         if (rMean > 0.70f && gMean > 0.70f && bMean > 0.65f) {
-            aRice = 0.88f;
+            aRice *= 8.0f;
         }
-        // If wheat brown flat tone -> roti
-        if (rMean > 0.55f && gMean > 0.45f && bMean < 0.38f && redness < 0.35f) {
-            aRoti = 0.80f;
+
+        // F. Dal Tadka / Yellow Lentil Curry:
+        // Bright turmeric yellow liquid/gravy
+        if (rMean > 0.52f && gMean > 0.42f && bMean < 0.25f && yellowness > 0.28f && greenness < 0.03f) {
+            aDal *= 8.0f;
+        }
+
+        // G. Whole Wheat Roti:
+        // Circular tan-brown flatbread
+        if (rMean > 0.50f && gMean > 0.40f && bMean > 0.28f && bMean < 0.42f && greenness < 0.02f && !hasTopBun) {
+            aRoti *= 6.0f;
+        }
+
+        // H. Crispy Samosa:
+        // Golden fried pastry shell
+        if (yellowness > 0.18f && redness > 0.40f && greenness < 0.02f && !hasTopBun) {
+            aSamosa *= 4.0f;
         }
 
         float total = ap + as_ + af + aBurger + aSamosa + aDal + aRoti + aRice;
 
+        candidates.add(createPrediction("hamburger", aBurger / total));
         candidates.add(createPrediction("pizza", ap / total));
         candidates.add(createPrediction("caesar_salad", as_ / total));
         candidates.add(createPrediction("french_fries", af / total));
-        candidates.add(createPrediction("hamburger", aBurger / total));
         candidates.add(createPrediction("samosa", aSamosa / total));
         candidates.add(createPrediction("dal", aDal / total));
         candidates.add(createPrediction("roti", aRoti / total));
