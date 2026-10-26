@@ -78,9 +78,28 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void handleForceSync() {
+        Toast.makeText(this, "Testing Firestore connection & syncing...", Toast.LENGTH_SHORT).show();
+
+        // 1. Run live connection ping
+        FirebaseManager.getInstance(this).testFirestoreConnection(new FirebaseManager.SyncCallback() {
+            @Override
+            public void onSuccess() {
+                runOnUiThread(() -> {
+                    Toast.makeText(SettingsActivity.this, "✅ Firestore connected! Synced ping to _health_check", Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(SettingsActivity.this, "⚠️ Firestore connection note: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+            }
+        });
+
+        // 2. Enqueue WorkManager for any pending changes
         OneTimeWorkRequest work = new OneTimeWorkRequest.Builder(SyncWorker.class).build();
         WorkManager.getInstance(this).enqueue(work);
-        Toast.makeText(this, "Triggered Cloud Sync WorkManager task", Toast.LENGTH_SHORT).show();
         updateSyncStatus();
     }
 

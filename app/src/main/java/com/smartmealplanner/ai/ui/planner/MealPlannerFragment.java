@@ -144,6 +144,19 @@ public class MealPlannerFragment extends Fragment {
 
         db.mealPlanDao().insertOrUpdate(currentPlan);
 
+        FirebaseManager.getInstance(getContext()).syncMealPlanToCloud(currentPlan, new FirebaseManager.SyncCallback() {
+            @Override
+            public void onSuccess() {
+                AppDatabase.databaseWriteExecutor.execute(() -> {
+                    try {
+                        db.mealPlanDao().markAsSynced(currentPlan.planId);
+                    } catch (Exception ignored) {}
+                });
+            }
+            @Override
+            public void onFailure(Exception e) {}
+        });
+
         if (getActivity() != null) {
             getActivity().runOnUiThread(this::updatePlanUI);
         }
@@ -198,6 +211,19 @@ public class MealPlannerFragment extends Fragment {
         AppDatabase db = AppDatabase.getInstance(getContext());
         AppDatabase.databaseWriteExecutor.execute(() -> {
             db.mealPlanDao().insertOrUpdate(currentPlan);
+
+        FirebaseManager.getInstance(getContext()).syncMealPlanToCloud(currentPlan, new FirebaseManager.SyncCallback() {
+            @Override
+            public void onSuccess() {
+                AppDatabase.databaseWriteExecutor.execute(() -> {
+                    try {
+                        db.mealPlanDao().markAsSynced(currentPlan.planId);
+                    } catch (Exception ignored) {}
+                });
+            }
+            @Override
+            public void onFailure(Exception e) {}
+        });
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
                     updatePlanUI();

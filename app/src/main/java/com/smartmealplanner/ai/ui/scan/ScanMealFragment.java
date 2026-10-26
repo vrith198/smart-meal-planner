@@ -731,9 +731,28 @@ public class ScanMealFragment extends Fragment {
 
                 db.loggedMealDao().insert(meal);
 
+                // Real-time Cloud Firestore synchronization
+                com.smartmealplanner.ai.firebase.FirebaseManager.getInstance(requireContext())
+                    .syncMealToCloud(meal, new com.smartmealplanner.ai.firebase.FirebaseManager.SyncCallback() {
+                        @Override
+                        public void onSuccess() {
+                            android.util.Log.i("ScanMealFragment", "✅ Meal synced to Firestore in real-time: " + meal.mealId);
+                            AppDatabase.databaseWriteExecutor.execute(() -> {
+                                try {
+                                    db.loggedMealDao().markAsSynced(meal.mealId);
+                                } catch (Exception ignored) {}
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            android.util.Log.w("ScanMealFragment", "⚠️ Firestore real-time sync deferred (will sync via WorkManager): " + e.getMessage());
+                        }
+                    });
+
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
-                        Toast.makeText(getContext(), "✅ Logged " + p.getDisplayName() + " (" + p.getCalories() + " kcal) to Dashboard!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "✅ Logged " + p.getDisplayName() + " (" + p.getCalories() + " kcal) & syncing to cloud!", Toast.LENGTH_LONG).show();
                     });
                 }
             } catch (Exception e) {

@@ -9,6 +9,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.SetOptions;
 import com.smartmealplanner.ai.database.AppDatabase;
 import com.smartmealplanner.ai.database.entity.*;
@@ -47,8 +48,19 @@ public class FirebaseManager {
             }
             auth = FirebaseAuth.getInstance();
             firestore = FirebaseFirestore.getInstance();
+
+            // Enable offline persistence so writes succeed locally even with spotty connection
+            FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                    .setPersistenceEnabled(true)
+                    .build();
+            firestore.setFirestoreSettings(settings);
+
             isFirebaseAvailable = true;
-            Log.d(TAG, "Firebase initialized successfully.");
+            Log.i(TAG, "Firebase and Cloud Firestore initialized successfully with offline persistence.");
+
+            // Automatically establish anonymous auth session if user is not yet signed in
+            ensureAuthenticated();
+
         } catch (Exception e) {
             Log.w(TAG, "Firebase initialization warning: " + e.getMessage() + ". Running in offline-first Room mode.");
             isFirebaseAvailable = false;
@@ -75,10 +87,25 @@ public class FirebaseManager {
         return auth.getCurrentUser() != null;
     }
 
+    public void ensureAuthenticated() {
+        if (!isFirebaseAvailable || auth == null) return;
+        if (auth.getCurrentUser() == null) {
+            auth.signInAnonymously()
+                .addOnSuccessListener(authResult -> {
+                    FirebaseUser u = authResult.getUser();
+                    String uid = u != null ? u.getUid() : "unknown";
+                    Log.i(TAG, "Signed in anonymously to Firebase Auth. UID: " + uid);
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "Anonymous auth not enabled in Firebase Console (writing as guest_user): " + e.getMessage());
+                });
+        }
+    }
+
     public String getCurrentUserId() {
         if (isFirebaseAvailable && auth != null) {
             FirebaseUser user = auth.getCurrentUser();
-            if (user != null) {
+            if (user != null && user.getUid() != null && !user.getUid().isEmpty()) {
                 return user.getUid();
             }
         }
@@ -156,16 +183,45 @@ public class FirebaseManager {
                                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET));
     }
 
+    // --- Health Check / Diagnostic Test Ping ---
+
+    public void testFirestoreConnection(SyncCallback callback) {
+        if (!isFirebaseAvailable || firestore == null) {
+            if (callback != null) callback.onFailure(new IllegalStateException("Firebase is not initialized"));
+            return;
+        }
+        Map<String, Object> testDoc = new HashMap<>();
+        testDoc.put("ping", "ok");
+        testDoc.put("timestampMs", System.currentTimeMillis());
+        testDoc.put("deviceModel", android.os.Build.MODEL);
+
+        firestore.collection("_health_check").document("ping")
+                 .set(testDoc, SetOptions.merge())
+                 .addOnSuccessListener(aVoid -> {
+                     Log.i(TAG, "✅ [Firestore] Test ping write succeeded!");
+                     if (callback != null) callback.onSuccess();
+                 })
+                 .addOnFailureListener(e -> {
+                     Log.e(TAG, "❌ [Firestore] Test ping failed: " + e.getMessage(), e);
+                     if (callback != null) callback.onFailure(e);
+                 });
+    }
+
     // --- Cloud Firestore Push Operations ---
 
     public void syncMealToCloud(LoggedMealEntity meal, SyncCallback callback) {
         if (!isFirebaseAvailable || firestore == null || meal == null) {
-            if (callback != null) callback.onSuccess();
+            Log.w(TAG, "Cannot sync meal: Firebase unavailable or meal is null.");
+            if (callback != null) callback.onFailure(new IllegalStateException("Firebase unavailable"));
             return;
         }
-        String uid = meal.userId;
+
+        String rawUid = (meal.userId != null && !meal.userId.trim().isEmpty()) ? meal.userId : getCurrentUserId();
+        final String uid = (rawUid != null && !rawUid.trim().isEmpty()) ? rawUid : GUEST_USER_ID;
+
         Map<String, Object> data = new HashMap<>();
         data.put("mealId", meal.mealId);
+        data.put("userId", uid);
         data.put("foodId", meal.foodId);
         data.put("foodName", meal.foodName);
         data.put("mealSlot", meal.mealSlot);
@@ -179,24 +235,36 @@ public class FirebaseManager {
         data.put("dateString", meal.dateString);
         data.put("updatedAtMs", meal.updatedAtMs);
 
+        // Ensure parent document exists so user node is clearly visible in Firestore Console
+        Map<String, Object> userMeta = new HashMap<>();
+        userMeta.put("userId", uid);
+        userMeta.put("lastActiveMs", System.currentTimeMillis());
+        firestore.collection("users").document(uid).set(userMeta, SetOptions.merge());
+
+        // Write to users/{uid}/meals/{mealId}
         firestore.collection("users").document(uid)
                  .collection("meals").document(meal.mealId)
                  .set(data, SetOptions.merge())
-                 .addOnSuccessListener(AppDatabase.databaseWriteExecutor, aVoid -> {
+                 .addOnSuccessListener(aVoid -> {
+                     Log.i(TAG, "✅ [Firestore] Synced meal: " + meal.foodName + " (" + meal.mealId + ") -> users/" + uid + "/meals");
                      if (callback != null) callback.onSuccess();
                  })
-                 .addOnFailureListener(AppDatabase.databaseWriteExecutor, e -> {
+                 .addOnFailureListener(e -> {
+                     Log.e(TAG, "❌ [Firestore] Failed syncing meal " + meal.mealId + ": " + e.getMessage(), e);
                      if (callback != null) callback.onFailure(e);
                  });
     }
 
     public void syncProfileToCloud(UserProfileEntity profile, SyncCallback callback) {
         if (!isFirebaseAvailable || firestore == null || profile == null) {
-            if (callback != null) callback.onSuccess();
+            if (callback != null) callback.onFailure(new IllegalStateException("Firebase unavailable"));
             return;
         }
+
+        String rawUid = (profile.userId != null && !profile.userId.trim().isEmpty()) ? profile.userId : getCurrentUserId();
+        final String uid = (rawUid != null && !rawUid.trim().isEmpty()) ? rawUid : GUEST_USER_ID;
         Map<String, Object> data = new HashMap<>();
-        data.put("userId", profile.userId);
+        data.put("userId", uid);
         data.put("fullName", profile.fullName);
         data.put("email", profile.email);
         data.put("age", profile.age);
@@ -214,23 +282,29 @@ public class FirebaseManager {
         data.put("targetFatGrams", profile.targetFatGrams);
         data.put("updatedAtMs", profile.updatedAtMs);
 
-        firestore.collection("users").document(profile.userId)
+        firestore.collection("users").document(uid)
                  .set(data, SetOptions.merge())
-                 .addOnSuccessListener(AppDatabase.databaseWriteExecutor, aVoid -> {
+                 .addOnSuccessListener(aVoid -> {
+                     Log.i(TAG, "✅ [Firestore] Synced user profile -> users/" + uid);
                      if (callback != null) callback.onSuccess();
                  })
-                 .addOnFailureListener(AppDatabase.databaseWriteExecutor, e -> {
+                 .addOnFailureListener(e -> {
+                     Log.e(TAG, "❌ [Firestore] Failed syncing user profile: " + e.getMessage(), e);
                      if (callback != null) callback.onFailure(e);
                  });
     }
 
     public void syncGroceryToCloud(GroceryItemEntity item, SyncCallback callback) {
         if (!isFirebaseAvailable || firestore == null || item == null) {
-            if (callback != null) callback.onSuccess();
+            if (callback != null) callback.onFailure(new IllegalStateException("Firebase unavailable"));
             return;
         }
+
+        String rawUid = (item.userId != null && !item.userId.trim().isEmpty()) ? item.userId : getCurrentUserId();
+        final String uid = (rawUid != null && !rawUid.trim().isEmpty()) ? rawUid : GUEST_USER_ID;
         Map<String, Object> data = new HashMap<>();
         data.put("itemId", item.itemId);
+        data.put("userId", uid);
         data.put("ingredientName", item.ingredientName);
         data.put("quantity", item.quantity);
         data.put("unit", item.unit);
@@ -238,36 +312,79 @@ public class FirebaseManager {
         data.put("isChecked", item.isChecked);
         data.put("updatedAtMs", item.updatedAtMs);
 
-        firestore.collection("users").document(item.userId)
+        firestore.collection("users").document(uid)
                  .collection("grocery").document(item.itemId)
                  .set(data, SetOptions.merge())
-                 .addOnSuccessListener(AppDatabase.databaseWriteExecutor, aVoid -> {
+                 .addOnSuccessListener(aVoid -> {
+                     Log.i(TAG, "✅ [Firestore] Synced grocery item: " + item.ingredientName + " -> users/" + uid + "/grocery");
                      if (callback != null) callback.onSuccess();
                  })
-                 .addOnFailureListener(AppDatabase.databaseWriteExecutor, e -> {
+                 .addOnFailureListener(e -> {
+                     Log.e(TAG, "❌ [Firestore] Failed syncing grocery item: " + e.getMessage(), e);
+                     if (callback != null) callback.onFailure(e);
+                 });
+    }
+
+    public void syncMealPlanToCloud(MealPlanEntity plan, SyncCallback callback) {
+        if (!isFirebaseAvailable || firestore == null || plan == null) {
+            if (callback != null) callback.onFailure(new IllegalStateException("Firebase unavailable"));
+            return;
+        }
+
+        String rawUid = (plan.userId != null && !plan.userId.trim().isEmpty()) ? plan.userId : getCurrentUserId();
+        final String uid = (rawUid != null && !rawUid.trim().isEmpty()) ? rawUid : GUEST_USER_ID;
+        Map<String, Object> data = new HashMap<>();
+        data.put("planId", plan.planId);
+        data.put("userId", uid);
+        data.put("dateString", plan.dateString);
+        data.put("breakfastFoodId", plan.breakfastFoodId);
+        data.put("lunchFoodId", plan.lunchFoodId);
+        data.put("snackFoodId", plan.snackFoodId);
+        data.put("dinnerFoodId", plan.dinnerFoodId);
+        data.put("totalCalories", plan.totalCalories);
+        data.put("totalProteinGrams", plan.totalProteinGrams);
+        data.put("totalCarbsGrams", plan.totalCarbsGrams);
+        data.put("totalFatGrams", plan.totalFatGrams);
+        data.put("updatedAtMs", plan.updatedAtMs);
+
+        firestore.collection("users").document(uid)
+                 .collection("meal_plans").document(plan.planId)
+                 .set(data, SetOptions.merge())
+                 .addOnSuccessListener(aVoid -> {
+                     Log.i(TAG, "✅ [Firestore] Synced meal plan for date: " + plan.dateString + " -> users/" + uid + "/meal_plans");
+                     if (callback != null) callback.onSuccess();
+                 })
+                 .addOnFailureListener(e -> {
+                     Log.e(TAG, "❌ [Firestore] Failed syncing meal plan: " + e.getMessage(), e);
                      if (callback != null) callback.onFailure(e);
                  });
     }
 
     public void syncUcbStateToCloud(UCB1StateEntity state, SyncCallback callback) {
         if (!isFirebaseAvailable || firestore == null || state == null) {
-            if (callback != null) callback.onSuccess();
+            if (callback != null) callback.onFailure(new IllegalStateException("Firebase unavailable"));
             return;
         }
+
+        String rawUid = (state.userId != null && !state.userId.trim().isEmpty()) ? state.userId : getCurrentUserId();
+        final String uid = (rawUid != null && !rawUid.trim().isEmpty()) ? rawUid : GUEST_USER_ID;
         Map<String, Object> data = new HashMap<>();
         data.put("armId", state.armId);
+        data.put("userId", uid);
         data.put("selections", state.selections);
         data.put("totalReward", state.totalReward);
         data.put("meanReward", state.meanReward);
         data.put("lastUpdatedMs", state.lastUpdatedMs);
 
-        firestore.collection("users").document(state.userId)
+        firestore.collection("users").document(uid)
                  .collection("recommendation_state").document(state.armId)
                  .set(data, SetOptions.merge())
-                 .addOnSuccessListener(AppDatabase.databaseWriteExecutor, aVoid -> {
+                 .addOnSuccessListener(aVoid -> {
+                     Log.i(TAG, "✅ [Firestore] Synced recommendation state: " + state.armId);
                      if (callback != null) callback.onSuccess();
                  })
-                 .addOnFailureListener(AppDatabase.databaseWriteExecutor, e -> {
+                 .addOnFailureListener(e -> {
+                     Log.e(TAG, "❌ [Firestore] Failed syncing bandit state: " + e.getMessage(), e);
                      if (callback != null) callback.onFailure(e);
                  });
     }

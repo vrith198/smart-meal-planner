@@ -239,11 +239,25 @@ public class ProfileFragment extends Fragment {
         AppDatabase db = AppDatabase.getInstance(getContext());
         AppDatabase.databaseWriteExecutor.execute(() -> {
             db.userDao().insertOrUpdate(updated);
-            FirebaseManager.getInstance(getContext()).syncProfileToCloud(updated, null);
+            FirebaseManager.getInstance(getContext()).syncProfileToCloud(updated, new FirebaseManager.SyncCallback() {
+                @Override
+                public void onSuccess() {
+                    AppDatabase.databaseWriteExecutor.execute(() -> {
+                        try {
+                            db.userDao().markAsSynced(updated.userId);
+                        } catch (Exception ignored) {}
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    android.util.Log.w("ProfileFragment", "Profile sync deferred: " + e.getMessage());
+                }
+            });
 
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
-                    Toast.makeText(getContext(), "Profile and nutrition targets saved!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Profile and nutrition targets saved & syncing to cloud!", Toast.LENGTH_SHORT).show();
                 });
             }
         });

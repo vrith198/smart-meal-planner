@@ -140,6 +140,24 @@ public class GroceryFragment extends Fragment implements GroceryAdapter.OnGrocer
 
             if (!groceryList.isEmpty()) {
                 db.groceryDao().insertAll(groceryList);
+
+                // Sync each grocery item to Firestore
+                FirebaseManager fm = FirebaseManager.getInstance(getContext());
+                for (GroceryItemEntity gItem : groceryList) {
+                    fm.syncGroceryToCloud(gItem, new FirebaseManager.SyncCallback() {
+                        @Override
+                        public void onSuccess() {
+                            AppDatabase.databaseWriteExecutor.execute(() -> {
+                                try {
+                                    db.groceryDao().markAsSynced(gItem.itemId);
+                                } catch (Exception ignored) {}
+                            });
+                        }
+                        @Override
+                        public void onFailure(Exception e) {}
+                    });
+                }
+
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         Toast.makeText(getContext(), "Generated " + groceryList.size() + " grocery items from meal plan!", Toast.LENGTH_SHORT).show();
@@ -217,6 +235,18 @@ public class GroceryFragment extends Fragment implements GroceryAdapter.OnGrocer
 
         AppDatabase.databaseWriteExecutor.execute(() -> {
             db.groceryDao().insert(item);
+            FirebaseManager.getInstance(getContext()).syncGroceryToCloud(item, new FirebaseManager.SyncCallback() {
+                @Override
+                public void onSuccess() {
+                    AppDatabase.databaseWriteExecutor.execute(() -> {
+                        try {
+                            db.groceryDao().markAsSynced(item.itemId);
+                        } catch (Exception ignored) {}
+                    });
+                }
+                @Override
+                public void onFailure(Exception e) {}
+            });
         });
     }
 

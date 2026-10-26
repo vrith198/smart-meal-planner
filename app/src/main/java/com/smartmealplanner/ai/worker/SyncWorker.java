@@ -144,6 +144,29 @@ public class SyncWorker extends Worker {
                 latch.await(3, TimeUnit.SECONDS);
             }
 
+            // 5. Sync Pending Meal Plans
+            List<com.smartmealplanner.ai.database.entity.MealPlanEntity> pendingPlans = db.mealPlanDao().getPendingSyncPlans();
+            for (com.smartmealplanner.ai.database.entity.MealPlanEntity plan : pendingPlans) {
+                CountDownLatch latch = new CountDownLatch(1);
+                firebaseManager.syncMealPlanToCloud(plan, new FirebaseManager.SyncCallback() {
+                    @Override
+                    public void onSuccess() {
+                        AppDatabase.databaseWriteExecutor.execute(() -> {
+                            try {
+                                db.mealPlanDao().markAsSynced(plan.planId);
+                            } catch (Exception ignored) {}
+                            latch.countDown();
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        latch.countDown();
+                    }
+                });
+                latch.await(3, TimeUnit.SECONDS);
+            }
+
             Log.d(TAG, "Offline sync pass completed successfully.");
             return Result.success();
 
