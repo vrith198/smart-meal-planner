@@ -44,8 +44,9 @@ public class GeminiVisionAgent {
     // Supported multimodal models with automatic fallback
     private static final String[] CANDIDATE_MODELS = new String[] {
             "gemini-1.5-flash",
+            "gemini-1.5-flash-latest",
             "gemini-2.0-flash",
-            "gemini-2.5-flash"
+            "gemini-1.5-pro"
     };
 
     private static final String BASE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
@@ -237,15 +238,15 @@ public class GeminiVisionAgent {
         // Prompt instructing structured schema with clear separation of visible vs inferred ingredients
         JSONObject textPart = new JSONObject();
         String prompt = "You are an expert clinical dietitian and computer vision agent for smart meal planning.\n"
-                + "Analyze this meal photograph carefully:\n"
-                + "1. Identify the likely main dish.\n"
+                + "Analyze this meal photograph carefully. Accurately detect common global and regional foods including Indian dishes (such as Idli, Dal Rice, Dosa, Roti, Chapati, Biryani, Samosa, Curry, Paneer) as well as Pizza, Burger, Salad, French Fries, Pasta, etc.:\n"
+                + "1. Identify the likely main dish with a clean, recognizable name (e.g., 'Idli with Chutney', 'Yellow Dal with Steamed Rice', 'Margherita Pizza', 'Veggie Burger', 'Masala Dosa').\n"
                 + "2. Identify visible ingredients that can actually be visually seen in the image.\n"
                 + "3. Identify recipe-inferred ingredients typical to this dish but not directly visible.\n"
                 + "4. List uncertain or optional ingredients.\n"
                 + "5. Estimate standard portion description and serving weight in grams.\n"
-                + "6. Estimate calories (kcal) and macronutrients (protein, carbs, fat in grams).\n"
+                + "6. Estimate calories (kcal) and macronutrients (protein, carbs, fat in grams) accurately based on standard nutritional data.\n"
                 + "7. Classify dietary type: 'VEGETARIAN', 'NON_VEGETARIAN', or 'VEGAN'.\n"
-                + "8. Provide an explanation describing the dish and assumptions.\n\n"
+                + "8. Provide a concise explanation describing the dish and assumptions.\n\n"
                 + "Respond STRICTLY with a valid JSON object matching this schema:\n"
                 + "{\n"
                 + "  \"dish_name\": \"Name of Dish\",\n"

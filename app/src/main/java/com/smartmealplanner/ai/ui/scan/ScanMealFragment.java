@@ -652,7 +652,7 @@ public class ScanMealFragment extends Fragment {
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Google Gemini Vision API Key")
-                .setMessage("Paste your Gemini API key (starts with AIzaSy...) to analyze custom or restaurant meals via cloud AI.\n\nDon't have a key? Tap 'Get Free Key' to open Google AI Studio in your browser.")
+                .setMessage("Note: On-Device AI scans meals (Idli, Dal Rice, Dosa, Roti, Biryani, Pizza, Burger, etc.) 100% offline without needing any API key.\n\nTo optionally use Google's multimodal Gemini Vision for complex custom dishes, paste your API key (starts with AIzaSy...).\n\nTap 'Get Free Key' to generate a free key from Google AI Studio.")
                 .setView(container)
                 .setPositiveButton("Save & Use", (dialog, which) -> {
                     String entered = input.getText().toString().trim();

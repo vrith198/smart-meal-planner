@@ -404,5 +404,52 @@
     "ingredients": [
       {"name": "Pasteurized Milk Curd", "amount": 150, "unit": "g"}
     ]
+  },
+  {
+    "id": "food_dal_rice",
+    "name": "Yellow Dal with Steamed Rice",
+    "classifierLabel": "dal_rice",
+    "dietaryType": "VEGETARIAN",
+    "mealCategory": "LUNCH",
+    "caloriesPer100g": 120.0,
+    "proteinPer100g": 3.6,
+    "carbsPer100g": 23.5,
+    "fatPer100g": 1.4,
+    "smallServingGrams": 150,
+    "mediumServingGrams": 250,
+    "largeServingGrams": 350,
+    "servingUnitName": "Plate (~250g)",
+    "estimatedCostInr": 50.0,
+    "allergens": [],
+    "source": "ICMR-NIN IFCT 2017 & USDA FoodData Central",
+    "ingredients": [
+      {"name": "Steamed White Rice", "amount": 150, "unit": "g"},
+      {"name": "Yellow Toor Dal", "amount": 100, "unit": "g"},
+      {"name": "Turmeric, Cumin & Ghee", "amount": 5, "unit": "g"}
+    ]
+  },
+  {
+    "id": "food_biryani",
+    "name": "Fragrant Vegetable Biryani",
+    "classifierLabel": "biryani",
+    "dietaryType": "VEGETARIAN",
+    "mealCategory": "LUNCH",
+    "caloriesPer100g": 160.0,
+    "proteinPer100g": 4.5,
+    "carbsPer100g": 26.0,
+    "fatPer100g": 4.5,
+    "smallServingGrams": 150,
+    "mediumServingGrams": 250,
+    "largeServingGrams": 350,
+    "servingUnitName": "Plate (~250g)",
+    "estimatedCostInr": 120.0,
+    "allergens": [],
+    "source": "ICMR-NIN IFCT 2017 & USDA FoodData Central",
+    "ingredients": [
+      {"name": "Spiced Basmati Rice", "amount": 160, "unit": "g"},
+      {"name": "Mixed Vegetables (Carrot, Beans, Peas)", "amount": 60, "unit": "g"},
+      {"name": "Biryani Spices & Saffron", "amount": 10, "unit": "g"},
+      {"name": "Fried Onions & Mint", "amount": 15, "unit": "g"}
+    ]
   }
 ]

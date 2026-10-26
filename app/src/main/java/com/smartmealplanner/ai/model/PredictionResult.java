@@ -233,6 +233,22 @@ public class PredictionResult {
         this.explanation = explanation != null ? explanation : "";
     }
 
+    public double getBaseCaloriesPer100g() {
+        return baseCaloriesPer100g;
+    }
+
+    public double getBaseProteinPer100g() {
+        return baseProteinPer100g;
+    }
+
+    public double getBaseCarbsPer100g() {
+        return baseCarbsPer100g;
+    }
+
+    public double getBaseFatPer100g() {
+        return baseFatPer100g;
+    }
+
     public boolean isGeminiResult() {
         return "GEMINI_AGENT".equalsIgnoreCase(aiSource);
     }
