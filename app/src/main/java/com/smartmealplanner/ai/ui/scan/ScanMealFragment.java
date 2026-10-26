@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.smartmealplanner.ai.R;
 import com.smartmealplanner.ai.database.AppDatabase;
 import com.smartmealplanner.ai.database.entity.FoodItemEntity;
@@ -60,6 +61,17 @@ public class ScanMealFragment extends Fragment {
     private TextView tvAiMacroProtein, tvAiMacroCarbs, tvAiMacroFat;
     private TextView tvAiIngredients, tvAiHealthNotes;
     private MaterialButton btnQuickLogMeal;
+
+    // Portion & Structured Ingredient breakdown views
+    private ChipGroup chipGroupServingPortion;
+    private Chip chipPortionSmall, chipPortionMedium, chipPortionLarge;
+    private TextView tvAiVisibleIngredients;
+    private TextView tvAiInferredIngredients;
+    private TextView tvAiUncertainIngredients;
+    private MaterialButton btnEditIngredients;
+    private MaterialButton btnRetryScan;
+    private TextView tvNutritionDisclaimer;
+    private PredictionResult activePrediction;
 
     // Gemini Multimodal Vision Agent Views
     private View layoutGeminiAgentRow;
@@ -236,6 +248,42 @@ public class ScanMealFragment extends Fragment {
         tvAiHealthNotes = v.findViewById(R.id.tvAiHealthNotes);
         btnQuickLogMeal = v.findViewById(R.id.btnQuickLogMeal);
 
+        chipGroupServingPortion = v.findViewById(R.id.chipGroupServingPortion);
+        chipPortionSmall = v.findViewById(R.id.chipPortionSmall);
+        chipPortionMedium = v.findViewById(R.id.chipPortionMedium);
+        chipPortionLarge = v.findViewById(R.id.chipPortionLarge);
+        tvAiVisibleIngredients = v.findViewById(R.id.tvAiVisibleIngredients);
+        tvAiInferredIngredients = v.findViewById(R.id.tvAiInferredIngredients);
+        tvAiUncertainIngredients = v.findViewById(R.id.tvAiUncertainIngredients);
+        btnEditIngredients = v.findViewById(R.id.btnEditIngredients);
+        btnRetryScan = v.findViewById(R.id.btnRetryScan);
+        tvNutritionDisclaimer = v.findViewById(R.id.tvNutritionDisclaimer);
+
+        if (btnRetryScan != null) {
+            btnRetryScan.setOnClickListener(view -> resetScanState());
+        }
+
+        if (btnEditIngredients != null) {
+            btnEditIngredients.setOnClickListener(view -> showEditIngredientsDialog());
+        }
+
+        if (chipGroupServingPortion != null) {
+            chipGroupServingPortion.setOnCheckedStateChangeListener((group, checkedIds) -> {
+                if (activePrediction == null) return;
+                int baseGrams = activePrediction.getServingWeightGrams() > 0 ? activePrediction.getServingWeightGrams() : 150;
+                if (checkedIds.contains(R.id.chipPortionSmall)) {
+                    int smallGrams = Math.max(50, (int) Math.round(baseGrams * 0.6));
+                    activePrediction.recalculateNutrition(smallGrams);
+                } else if (checkedIds.contains(R.id.chipPortionLarge)) {
+                    int largeGrams = (int) Math.round(baseGrams * 1.5);
+                    activePrediction.recalculateNutrition(largeGrams);
+                } else {
+                    activePrediction.recalculateNutrition(baseGrams);
+                }
+                renderActiveNutritionUI(activePrediction);
+            });
+        }
+
         layoutGeminiAgentRow = v.findViewById(R.id.layoutGeminiAgentRow);
         btnAnalyzeWithGemini = v.findViewById(R.id.btnAnalyzeWithGemini);
         btnGeminiKeySettings = v.findViewById(R.id.btnGeminiKeySettings);
@@ -324,43 +372,8 @@ public class ScanMealFragment extends Fragment {
 
         // Top 1 Primary Detection
         PredictionResult p1 = predictions.get(0);
-
-        // Bind AI Calorie Estimation Card
-        if (cardAiCalorieEstimate != null) {
-            cardAiCalorieEstimate.setVisibility(View.VISIBLE);
-            if (tvAiSourceBadge != null) tvAiSourceBadge.setText("📱 On-Device AI");
-            tvAiDetectedFoodName.setText(p1.getDisplayName());
-            tvAiConfidenceBadge.setText(p1.getConfidencePercentage() + "% Match");
-            tvAiEstimatedCalories.setText("🔥 " + p1.getCalories() + " kcal");
-            tvAiServingDesc.setText("(" + p1.getServingUnit() + ")");
-            tvAiMacroProtein.setText("Protein: " + p1.getProtein() + "g");
-            tvAiMacroCarbs.setText("Carbs: " + p1.getCarbs() + "g");
-            tvAiMacroFat.setText("Fat: " + p1.getFat() + "g");
-
-            if (p1.getIngredients() != null && !p1.getIngredients().isEmpty()) {
-                if (tvAiIngredients != null) {
-                    tvAiIngredients.setText("🥗 Ingredients: " + joinStrings(p1.getIngredients(), ", "));
-                    tvAiIngredients.setVisibility(View.VISIBLE);
-                }
-            } else {
-                if (tvAiIngredients != null) tvAiIngredients.setVisibility(View.GONE);
-            }
-
-            if (p1.getHealthNotes() != null && !p1.getHealthNotes().isEmpty()) {
-                if (tvAiHealthNotes != null) {
-                    tvAiHealthNotes.setText("💡 " + p1.getHealthNotes());
-                    tvAiHealthNotes.setVisibility(View.VISIBLE);
-                }
-            } else {
-                if (tvAiHealthNotes != null) tvAiHealthNotes.setVisibility(View.GONE);
-            }
-
-            if (btnAnalyzeWithGemini != null) btnAnalyzeWithGemini.setEnabled(true);
-            if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
-
-            btnQuickLogMeal.setText("⚡ Log " + p1.getDisplayName() + " (" + p1.getCalories() + " kcal)");
-            btnQuickLogMeal.setOnClickListener(view -> handleQuickLog(p1));
-        }
+        this.activePrediction = p1;
+        renderActiveNutritionUI(p1);
 
         tvPred1Name.setText("1. " + p1.getDisplayName() + " (" + p1.getCalories() + " kcal)");
         tvPred1Conf.setText(p1.getConfidencePercentage() + "%");
@@ -472,40 +485,146 @@ public class ScanMealFragment extends Fragment {
     }
 
     private void displayGeminiPrediction(PredictionResult p) {
-        if (cardAiCalorieEstimate != null) {
-            cardAiCalorieEstimate.setVisibility(View.VISIBLE);
-            if (tvAiSourceBadge != null) tvAiSourceBadge.setText("✨ Gemini Vision Agent");
+        this.activePrediction = p;
+        renderActiveNutritionUI(p);
+        Toast.makeText(getContext(), "✨ Gemini Vision Agent analyzed " + p.getDisplayName() + " (" + p.getCalories() + " kcal)!", Toast.LENGTH_LONG).show();
+    }
+
+    private void renderActiveNutritionUI(PredictionResult p) {
+        if (p == null || cardAiCalorieEstimate == null) return;
+        cardAiCalorieEstimate.setVisibility(View.VISIBLE);
+
+        if (tvAiSourceBadge != null) {
+            tvAiSourceBadge.setText(p.isGeminiResult() ? "✨ Gemini Cloud AI" : "📱 On-Device AI");
+        }
+        if (tvAiDetectedFoodName != null) {
             tvAiDetectedFoodName.setText(p.getDisplayName());
-            tvAiConfidenceBadge.setText(p.getConfidencePercentage() + "% Match");
+        }
+        if (tvAiConfidenceBadge != null) {
+            if (p.isHighConfidence()) {
+                tvAiConfidenceBadge.setText(p.getConfidencePercentage() + "% Match");
+                tvAiConfidenceBadge.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary));
+            } else {
+                tvAiConfidenceBadge.setText(p.getConfidencePercentage() + "% (Uncertain)");
+                tvAiConfidenceBadge.setTextColor(ContextCompat.getColor(requireContext(), R.color.tertiary));
+            }
+        }
+        if (tvAiEstimatedCalories != null) {
             tvAiEstimatedCalories.setText("🔥 " + p.getCalories() + " kcal");
-            tvAiServingDesc.setText("(" + p.getServingUnit() + ")");
-            tvAiMacroProtein.setText("Protein: " + Math.round(p.getProtein()) + "g");
-            tvAiMacroCarbs.setText("Carbs: " + Math.round(p.getCarbs()) + "g");
-            tvAiMacroFat.setText("Fat: " + Math.round(p.getFat()) + "g");
+        }
+        if (tvAiServingDesc != null) {
+            tvAiServingDesc.setText("(Portion: ~" + p.getServingWeightGrams() + "g)");
+        }
+        if (tvAiMacroProtein != null) {
+            tvAiMacroProtein.setText("Protein: " + p.getProtein() + "g");
+        }
+        if (tvAiMacroCarbs != null) {
+            tvAiMacroCarbs.setText("Carbs: " + p.getCarbs() + "g");
+        }
+        if (tvAiMacroFat != null) {
+            tvAiMacroFat.setText("Fat: " + p.getFat() + "g");
+        }
 
-            if (p.getIngredients() != null && !p.getIngredients().isEmpty()) {
-                if (tvAiIngredients != null) {
-                    tvAiIngredients.setText("🥗 Ingredients: " + joinStrings(p.getIngredients(), ", "));
-                    tvAiIngredients.setVisibility(View.VISIBLE);
-                }
+        // Categorized Ingredients (Visible vs Inferred vs Uncertain)
+        if (tvAiVisibleIngredients != null) {
+            List<String> vis = p.getVisibleIngredients();
+            if (vis != null && !vis.isEmpty()) {
+                tvAiVisibleIngredients.setText("👁️ Visually Detected: " + joinStrings(vis, ", "));
+                tvAiVisibleIngredients.setVisibility(View.VISIBLE);
             } else {
-                if (tvAiIngredients != null) tvAiIngredients.setVisibility(View.GONE);
+                tvAiVisibleIngredients.setVisibility(View.GONE);
             }
+        }
 
+        if (tvAiInferredIngredients != null) {
+            List<String> inf = p.getInferredIngredients();
+            if (inf != null && !inf.isEmpty()) {
+                tvAiInferredIngredients.setText("📖 Recipe Inferred: " + joinStrings(inf, ", "));
+                tvAiInferredIngredients.setVisibility(View.VISIBLE);
+            } else {
+                tvAiInferredIngredients.setVisibility(View.GONE);
+            }
+        }
+
+        if (tvAiUncertainIngredients != null) {
+            List<String> unc = p.getUncertainIngredients();
+            if (unc != null && !unc.isEmpty()) {
+                tvAiUncertainIngredients.setText("❓ Uncertain: " + joinStrings(unc, ", "));
+                tvAiUncertainIngredients.setVisibility(View.VISIBLE);
+            } else {
+                tvAiUncertainIngredients.setVisibility(View.GONE);
+            }
+        }
+
+        if (tvAiHealthNotes != null) {
             if (p.getHealthNotes() != null && !p.getHealthNotes().isEmpty()) {
-                if (tvAiHealthNotes != null) {
-                    tvAiHealthNotes.setText("💡 " + p.getHealthNotes());
-                    tvAiHealthNotes.setVisibility(View.VISIBLE);
-                }
+                tvAiHealthNotes.setText("💡 " + p.getHealthNotes());
+                tvAiHealthNotes.setVisibility(View.VISIBLE);
             } else {
-                if (tvAiHealthNotes != null) tvAiHealthNotes.setVisibility(View.GONE);
+                tvAiHealthNotes.setVisibility(View.GONE);
             }
+        }
 
+        if (btnQuickLogMeal != null) {
             btnQuickLogMeal.setText("⚡ Log " + p.getDisplayName() + " (" + p.getCalories() + " kcal)");
             btnQuickLogMeal.setOnClickListener(view -> handleQuickLog(p));
         }
 
-        Toast.makeText(getContext(), "✨ Gemini Vision Agent analyzed " + p.getDisplayName() + " (" + p.getCalories() + " kcal)!", Toast.LENGTH_LONG).show();
+        if (btnAnalyzeWithGemini != null) btnAnalyzeWithGemini.setEnabled(true);
+        if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
+    }
+
+    private void showEditIngredientsDialog() {
+        if (getContext() == null || activePrediction == null) return;
+
+        final EditText input = new EditText(getContext());
+        input.setSingleLine(false);
+        input.setLines(4);
+        List<String> current = new ArrayList<>();
+        if (activePrediction.getVisibleIngredients() != null) current.addAll(activePrediction.getVisibleIngredients());
+        if (activePrediction.getInferredIngredients() != null) current.addAll(activePrediction.getInferredIngredients());
+        input.setText(joinStrings(current, ", "));
+
+        FrameLayout container = new FrameLayout(getContext());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        int marginPx = (int) (20 * getResources().getDisplayMetrics().density);
+        params.leftMargin = marginPx;
+        params.rightMargin = marginPx;
+        params.topMargin = marginPx / 2;
+        params.bottomMargin = marginPx / 2;
+        input.setLayoutParams(params);
+        container.addView(input);
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Edit Ingredients")
+                .setMessage("Add, remove, or adjust visible and recipe ingredients (comma-separated):")
+                .setView(container)
+                .setPositiveButton("Save Ingredients", (dialog, which) -> {
+                    String entered = input.getText().toString().trim();
+                    List<String> updated = new ArrayList<>();
+                    if (!entered.isEmpty()) {
+                        for (String s : entered.split(",")) {
+                            if (!s.trim().isEmpty()) updated.add(s.trim());
+                        }
+                    }
+                    activePrediction.setVisibleIngredients(updated);
+                    activePrediction.setIngredients(updated);
+                    renderActiveNutritionUI(activePrediction);
+                    Toast.makeText(getContext(), "Ingredients updated!", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void resetScanState() {
+        currentBitmap = null;
+        activePrediction = null;
+        if (ivPreview != null) ivPreview.setImageDrawable(null);
+        if (layoutEmptyPreview != null) layoutEmptyPreview.setVisibility(View.VISIBLE);
+        if (layoutPredictions != null) layoutPredictions.setVisibility(View.GONE);
+        if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
+        checkAndLaunchCamera();
     }
 
     private void showApiKeyInputDialog(@Nullable Runnable onKeySaved) {
@@ -599,7 +718,7 @@ public class ScanMealFragment extends Fragment {
                     p.getDisplayName(),
                     mealSlot,
                     "MEDIUM",
-                    200,
+                    p.getServingWeightGrams() > 0 ? p.getServingWeightGrams() : 150,
                     p.getCalories(),
                     p.getProtein(),
                     p.getCarbs(),

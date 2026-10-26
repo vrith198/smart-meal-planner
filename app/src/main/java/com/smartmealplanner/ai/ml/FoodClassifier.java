@@ -290,9 +290,10 @@ public class FoodClassifier {
                     for (int i = 0; i < INPUT_SIZE; ++i) {
                         for (int j = 0; j < INPUT_SIZE; ++j) {
                             final int val = intValues[pixel++];
-                            float r = (((val >> 16) & 0xFF) - 127.5f) / 127.5f;
-                            float g = (((val >> 8) & 0xFF) - 127.5f) / 127.5f;
-                            float b = ((val & 0xFF) - 127.5f) / 127.5f;
+                            // Pass raw [0.0, 255.0] float values; the TFLite Rescaling layer handles [-1.0, 1.0] scaling
+                            float r = (float) ((val >> 16) & 0xFF);
+                            float g = (float) ((val >> 8) & 0xFF);
+                            float b = (float) (val & 0xFF);
                             inputBuffer.putFloat(r);
                             inputBuffer.putFloat(g);
                             inputBuffer.putFloat(b);
@@ -546,6 +547,42 @@ public class FoodClassifier {
             pred.setDietaryType(info.dietaryType);
             pred.setHealthNotes(info.healthNotes);
             pred.setAiSource("ON_DEVICE_AI");
+            pred.setBaseNutrition(info.caloriesPer100g, info.proteinPer100g, info.carbsPer100g, info.fatPer100g, info.mediumServingGrams);
+
+            // Separate visually detectable components from recipe-inferred ingredients
+            List<String> visible = new ArrayList<>();
+            List<String> inferred = new ArrayList<>();
+            List<String> uncertain = new ArrayList<>();
+
+            for (String ing : info.ingredients) {
+                String lower = ing.toLowerCase();
+                if (lower.contains("bun") || lower.contains("cheese") || lower.contains("patty") ||
+                    lower.contains("tomato") || lower.contains("lettuce") || lower.contains("rice") ||
+                    lower.contains("chutney") || lower.contains("paneer") || lower.contains("idli") ||
+                    lower.contains("potato") || lower.contains("crust") || lower.contains("sauce") ||
+                    lower.contains("chicken") || lower.contains("egg")) {
+                    visible.add(ing);
+                } else if (lower.contains("oil") || lower.contains("ghee") || lower.contains("salt") ||
+                           lower.contains("batter") || lower.contains("seeds") || lower.contains("atta") ||
+                           lower.contains("cumin") || lower.contains("turmeric") || lower.contains("mustard") ||
+                           lower.contains("flour") || lower.contains("spices")) {
+                    inferred.add(ing);
+                } else {
+                    visible.add(ing);
+                }
+            }
+
+            if (visible.isEmpty() && !info.ingredients.isEmpty()) {
+                visible.add(info.ingredients.get(0));
+            }
+
+            uncertain.add("Cooking Oil / Ghee absorption");
+            uncertain.add("Salt & Seasoning variance");
+
+            pred.setVisibleIngredients(visible);
+            pred.setInferredIngredients(inferred);
+            pred.setUncertainIngredients(uncertain);
+            pred.setExplanation("Classified via on-device AI matched to verified ICMR-NIN & USDA nutritional records.");
         }
         return pred;
     }

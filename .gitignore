@@ -81,3 +81,10 @@ ml/data/raw/
 docs/
 *.docx
 
+# Environment variables & Secrets (NEVER commit real keys)
+.env
+.env.*
+!.env.example
+*.env
+local.properties
+

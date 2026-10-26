@@ -314,13 +314,99 @@
                             android:textSize="12sp" />
                     </LinearLayout>
 
-                    <!-- Ingredients & Health Insights -->
+                    <!-- Interactive Serving Size Selector -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Portion Size:"
+                        android:textColor="@color/on_surface"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupServingPortion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipPortionSmall"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Small (0.6x)" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipPortionMedium"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="Medium (1.0x)" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipPortionLarge"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Large (1.5x)" />
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                    <!-- Structured Ingredients Breakdown -->
+                    <LinearLayout
+                        android:id="@+id/layoutIngredientDetails"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvAiVisibleIngredients"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="👁️ Visually Detected: ..."
+                            android:textColor="@color/on_surface"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvAiInferredIngredients"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="📖 Recipe Inferred: ..."
+                            android:textColor="@color/on_surface_variant"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvAiUncertainIngredients"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="❓ Uncertain: Cooking oil, salt"
+                            android:textColor="@color/outline"
+                            android:textSize="11sp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnEditIngredients"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="✏️ Edit Ingredients"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
+                    <!-- Legacy Ingredients & Health Insights -->
                     <TextView
                         android:id="@+id/tvAiIngredients"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Ingredients: Tomato, Cheese, Basil"
+                        android:layout_marginTop="4dp"
                         android:textColor="@color/on_surface_variant"
                         android:textSize="12sp"
                         android:visibility="gone" />
@@ -330,10 +416,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="💡 Rich in protein and calcium."
                         android:textColor="@color/primary"
                         android:textSize="12sp"
                         android:visibility="gone" />
+
+                    <!-- Honest Nutrition Estimation Disclaimer -->
+                    <TextView
+                        android:id="@+id/tvNutritionDisclaimer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/item_logged_meal"
+                        android:padding="8dp"
+                        android:text="⚠️ Note: Nutrition values are estimates derived from ICMR-NIN &amp; USDA tables. Actual calories vary with preparation and cooking oil."
+                        android:textColor="@color/on_surface_variant"
+                        android:textSize="11sp" />
 
                     <!-- Quick Log Button -->
                     <com.google.android.material.button.MaterialButton
@@ -343,7 +440,7 @@
                         android:layout_marginTop="14dp"
                         android:text="⚡ Log This Meal (532 kcal)" />
 
-                    <!-- Gemini Multimodal Vision Agent Action Row -->
+                    <!-- Action Row: Retry Scan & Gemini Multimodal Vision -->
                     <LinearLayout
                         android:id="@+id/layoutGeminiAgentRow"
                         android:layout_width="match_parent"
@@ -353,12 +450,22 @@
                         android:orientation="horizontal">
 
                         <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnRetryScan"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            android:text="🔄 Rescan"
+                            android:textSize="12sp" />
+
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnAnalyzeWithGemini"
                             style="@style/Widget.Material3.Button.TonalButton"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="✨ Analyze with Gemini Vision"
+                            android:layout_weight="1.6"
+                            android:text="✨ Gemini Cloud AI"
                             android:textSize="12sp" />
 
                         <com.google.android.material.button.MaterialButton
@@ -366,8 +473,8 @@
                             style="?attr/materialButtonOutlinedStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:text="🔑 Key"
+                            android:layout_marginStart="6dp"
+                            android:text="🔑"
                             android:textSize="12sp" />
                     </LinearLayout>
 

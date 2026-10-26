@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
 
+import com.smartmealplanner.ai.BuildConfig;
 import com.smartmealplanner.ai.model.PredictionResult;
 
 import org.json.JSONArray;
@@ -28,12 +29,11 @@ import java.util.concurrent.Executors;
 
 /**
  * Gemini Multimodal Vision Agent.
- * Sends meal photos to Google Gemini 1.5 Flash multimodal endpoint to analyze:
- * - Complex or uncatalogued dishes (restaurant foods, home cooking)
- * - Calorie estimation (kcal)
- * - Macronutrient breakdown (Protein, Carbs, Fat)
- * - Portion size assessment
- * - Ingredient breakdown and dietary health insights.
+ * Sends meal photos to Google Gemini multimodal endpoint to perform deep analysis:
+ * - Dish identification
+ * - Visual ingredient detection vs recipe-inferred ingredients vs uncertain ingredients
+ * - Portion size assessment & honest nutritional estimation
+ * - Dietary categorization and practical clinical insights.
  */
 public class GeminiVisionAgent {
 
@@ -41,10 +41,14 @@ public class GeminiVisionAgent {
     private static final String PREFS_NAME = "gemini_agent_prefs";
     private static final String KEY_GEMINI_API_KEY = "gemini_api_key";
 
-    // Recommended stable multimodal model
-    private static final String MODEL_NAME = "gemini-1.5-flash";
-    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/" 
-            + MODEL_NAME + ":generateContent?key=";
+    // Supported multimodal models with automatic fallback
+    private static final String[] CANDIDATE_MODELS = new String[] {
+            "gemini-1.5-flash",
+            "gemini-2.0-flash",
+            "gemini-2.5-flash"
+    };
+
+    private static final String BASE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
 
     private static final ExecutorService executor = Executors.newCachedThreadPool();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -54,15 +58,36 @@ public class GeminiVisionAgent {
         void onError(String errorMessage);
     }
 
+    /**
+     * Checks if a Gemini API key is configured either via runtime user preferences
+     * or via local untracked BuildConfig (local.properties).
+     */
     public static boolean hasApiKey(Context context) {
         String key = getApiKey(context);
         return key != null && !key.trim().isEmpty();
     }
 
+    /**
+     * Retrieves the Gemini API key, giving priority to runtime user-entered key,
+     * then falling back to BuildConfig.GEMINI_API_KEY.
+     */
     public static String getApiKey(Context context) {
         if (context == null) return null;
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        return prefs.getString(KEY_GEMINI_API_KEY, "");
+        String userKey = prefs.getString(KEY_GEMINI_API_KEY, "").trim();
+        if (!userKey.isEmpty()) {
+            return userKey;
+        }
+
+        // Fallback to local untracked build configuration (local.properties)
+        try {
+            if (BuildConfig.GEMINI_API_KEY != null && !BuildConfig.GEMINI_API_KEY.trim().isEmpty()) {
+                return BuildConfig.GEMINI_API_KEY.trim();
+            }
+        } catch (Exception ignored) {
+        }
+
+        return "";
     }
 
     public static void setApiKey(Context context, String apiKey) {
@@ -79,7 +104,7 @@ public class GeminiVisionAgent {
     }
 
     /**
-     * Analyzes a meal photo asynchronously via the Gemini 1.5 Flash Vision Agent.
+     * Analyzes a meal photo asynchronously via the Gemini Vision Agent with model fallback.
      */
     public void analyzeMealPhoto(Context context, Bitmap originalBitmap, AgentCallback callback) {
         if (originalBitmap == null) {
@@ -95,48 +120,84 @@ public class GeminiVisionAgent {
 
         executor.execute(() -> {
             try {
-                // 1. Prepare and optimize image bitmap
+                // 1. Prepare and optimize image bitmap (compress to balanced resolution)
                 Bitmap scaledBitmap = scaleBitmapDown(originalBitmap, 768);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
                 byte[] imageBytes = baos.toByteArray();
                 String base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
 
-                // 2. Build JSON Request payload
+                // 2. Build JSON Request payload according to requested schema
                 JSONObject payload = buildGeminiRequestPayload(base64Image);
+                byte[] input = payload.toString().getBytes(StandardCharsets.UTF_8);
 
-                // 3. Dispatch HTTP POST to Gemini REST API
-                URL url = new URL(GEMINI_API_URL + apiKey);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/json");
-                conn.setConnectTimeout(15000);
-                conn.setReadTimeout(25000);
-                conn.setDoOutput(true);
+                PredictionResult successfulResult = null;
+                String lastError = null;
 
-                try (OutputStream os = conn.getOutputStream()) {
-                    byte[] input = payload.toString().getBytes(StandardCharsets.UTF_8);
-                    os.write(input, 0, input.length);
+                // 3. Dispatch to primary model, falling back to secondary models if 404/unavailable
+                for (String modelName : CANDIDATE_MODELS) {
+                    try {
+                        String endpoint = BASE_API_URL + modelName + ":generateContent?key=" + apiKey;
+                        URL url = new URL(endpoint);
+
+                        // Secure logging: Mask API key in all internal logs
+                        String sanitizedUrl = BASE_API_URL + modelName + ":generateContent?key=REDACTED";
+                        Log.d(TAG, "Dispatching Gemini Vision request to: " + sanitizedUrl);
+
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setRequestMethod("POST");
+                        conn.setRequestProperty("Content-Type", "application/json");
+                        conn.setConnectTimeout(15000);
+                        conn.setReadTimeout(25000);
+                        conn.setDoOutput(true);
+
+                        try (OutputStream os = conn.getOutputStream()) {
+                            os.write(input, 0, input.length);
+                        }
+
+                        int responseCode = conn.getResponseCode();
+                        Log.d(TAG, "Gemini API [" + modelName + "] Response Code: " + responseCode);
+
+                        if (responseCode == HttpURLConnection.HTTP_OK) {
+                            String responseStr = readStream(conn.getInputStream());
+                            successfulResult = parseGeminiResponse(responseStr);
+                            break;
+                        } else {
+                            String errorStr = readStream(conn.getErrorStream());
+                            String sanitizedError = errorStr != null ? errorStr.replaceAll("key=[^&\\s\"]+", "key=REDACTED") : "";
+                            Log.w(TAG, "Gemini API [" + modelName + "] error (" + responseCode + "): " + sanitizedError);
+
+                            if (responseCode == 404) {
+                                // Try next candidate model
+                                lastError = "Model " + modelName + " not available on this API tier.";
+                                continue;
+                            } else {
+                                lastError = extractUserFriendlyError(responseCode, sanitizedError);
+                                break;
+                            }
+                        }
+                    } catch (java.net.SocketTimeoutException e) {
+                        lastError = "Gemini API connection timed out. Please check your internet connection.";
+                        break;
+                    } catch (java.net.UnknownHostException e) {
+                        lastError = "No internet connection available to reach Gemini AI Agent.";
+                        break;
+                    } catch (Exception e) {
+                        lastError = "Connection error: " + e.getMessage();
+                    }
                 }
 
-                int responseCode = conn.getResponseCode();
-                Log.d(TAG, "Gemini API Response Code: " + responseCode);
+                final PredictionResult finalResult = successfulResult;
+                final String finalErrorMessage = lastError != null ? lastError : "Gemini Vision analysis could not be completed.";
 
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    String responseStr = readStream(conn.getInputStream());
-                    PredictionResult result = parseGeminiResponse(responseStr);
-                    mainHandler.post(() -> callback.onSuccess(result));
-                } else {
-                    String errorStr = readStream(conn.getErrorStream());
-                    Log.e(TAG, "Gemini API Error (" + responseCode + "): " + errorStr);
-                    String userFriendlyMessage = extractUserFriendlyError(responseCode, errorStr);
-                    mainHandler.post(() -> callback.onError(userFriendlyMessage));
-                }
+                mainHandler.post(() -> {
+                    if (finalResult != null) {
+                        callback.onSuccess(finalResult);
+                    } else {
+                        callback.onError(finalErrorMessage);
+                    }
+                });
 
-            } catch (java.net.SocketTimeoutException e) {
-                mainHandler.post(() -> callback.onError("Gemini API connection timed out. Please check your internet connection and try again."));
-            } catch (java.net.UnknownHostException e) {
-                mainHandler.post(() -> callback.onError("No internet connection available to reach Gemini AI Agent."));
             } catch (Exception e) {
                 Log.e(TAG, "Unexpected error during Gemini analysis", e);
                 mainHandler.post(() -> callback.onError("Gemini Vision Agent error: " + e.getMessage()));
@@ -173,29 +234,33 @@ public class GeminiVisionAgent {
         JSONObject contentObj = new JSONObject();
         JSONArray partsArray = new JSONArray();
 
-        // Prompt part
+        // Prompt instructing structured schema with clear separation of visible vs inferred ingredients
         JSONObject textPart = new JSONObject();
         String prompt = "You are an expert clinical dietitian and computer vision agent for smart meal planning.\n"
                 + "Analyze this meal photograph carefully:\n"
-                + "1. Identify the meal or dish name clearly.\n"
-                + "2. Estimate the realistic portion weight and serving description (e.g., '1 bowl (~250g)' or '2 slices (~200g)').\n"
-                + "3. Predict total calories (kcal).\n"
-                + "4. Predict macronutrients: protein in grams, carbohydrates in grams, fat in grams.\n"
-                + "5. List visible primary ingredients.\n"
-                + "6. Classify dietary type: 'VEGETARIAN', 'NON_VEGETARIAN', or 'VEGAN'.\n"
-                + "7. Provide a concise, practical 1-sentence health insight.\n\n"
+                + "1. Identify the likely main dish.\n"
+                + "2. Identify visible ingredients that can actually be visually seen in the image.\n"
+                + "3. Identify recipe-inferred ingredients typical to this dish but not directly visible.\n"
+                + "4. List uncertain or optional ingredients.\n"
+                + "5. Estimate standard portion description and serving weight in grams.\n"
+                + "6. Estimate calories (kcal) and macronutrients (protein, carbs, fat in grams).\n"
+                + "7. Classify dietary type: 'VEGETARIAN', 'NON_VEGETARIAN', or 'VEGAN'.\n"
+                + "8. Provide an explanation describing the dish and assumptions.\n\n"
                 + "Respond STRICTLY with a valid JSON object matching this schema:\n"
                 + "{\n"
-                + "  \"foodName\": \"Full Name of Dish\",\n"
-                + "  \"calories\": 520,\n"
-                + "  \"protein\": 22.0,\n"
-                + "  \"carbs\": 64.0,\n"
-                + "  \"fat\": 18.0,\n"
-                + "  \"servingSize\": \"2 slices (~200g)\",\n"
+                + "  \"dish_name\": \"Name of Dish\",\n"
+                + "  \"visible_ingredients\": [\"item 1\", \"item 2\"],\n"
+                + "  \"inferred_ingredients\": [\"item 3\", \"item 4\"],\n"
+                + "  \"uncertain_ingredients\": [\"item 5\"],\n"
+                + "  \"estimated_serving_size\": \"1 plate (~250g)\",\n"
+                + "  \"serving_weight_grams\": 250,\n"
+                + "  \"calories\": 420,\n"
+                + "  \"protein\": 14.0,\n"
+                + "  \"carbs\": 58.0,\n"
+                + "  \"fat\": 12.0,\n"
                 + "  \"confidence\": 0.95,\n"
-                + "  \"ingredients\": [\"item 1\", \"item 2\"],\n"
-                + "  \"dietaryType\": \"VEGETARIAN\",\n"
-                + "  \"healthNotes\": \"Rich in complex carbohydrates and lean protein.\"\n"
+                + "  \"dietary_type\": \"VEGETARIAN\",\n"
+                + "  \"explanation\": \"Standard home-cooked portion. Values are estimates.\"\n"
                 + "}";
         textPart.put("text", prompt);
         partsArray.put(textPart);
@@ -212,7 +277,7 @@ public class GeminiVisionAgent {
         contentsArray.put(contentObj);
         payload.put("contents", contentsArray);
 
-        // Generation config for JSON output
+        // Generation config for structured JSON output
         JSONObject generationConfig = new JSONObject();
         generationConfig.put("responseMimeType", "application/json");
         generationConfig.put("temperature", 0.2);
@@ -225,6 +290,14 @@ public class GeminiVisionAgent {
         JSONObject root = new JSONObject(responseJsonStr);
         JSONArray candidates = root.optJSONArray("candidates");
         if (candidates == null || candidates.length() == 0) {
+            // Check if prompt was blocked by safety filters
+            JSONObject promptFeedback = root.optJSONObject("promptFeedback");
+            if (promptFeedback != null) {
+                String blockReason = promptFeedback.optString("blockReason", "");
+                if (!blockReason.isEmpty()) {
+                    throw new Exception("Analysis paused by Gemini safety filters (" + blockReason + ").");
+                }
+            }
             throw new Exception("Gemini returned empty candidate predictions.");
         }
 
@@ -240,7 +313,6 @@ public class GeminiVisionAgent {
         }
 
         String rawText = parts.getJSONObject(0).optString("text", "{}").trim();
-        // Clean markdown block if present
         if (rawText.startsWith("```json")) {
             rawText = rawText.substring(7);
         } else if (rawText.startsWith("```")) {
@@ -253,29 +325,34 @@ public class GeminiVisionAgent {
 
         JSONObject resultJson = new JSONObject(rawText);
 
-        String foodName = resultJson.optString("foodName", "Identified Meal");
+        String dishName = resultJson.optString("dish_name", resultJson.optString("foodName", "Identified Meal"));
         int calories = resultJson.optInt("calories", 350);
         float protein = (float) resultJson.optDouble("protein", 10.0);
         float carbs = (float) resultJson.optDouble("carbs", 45.0);
         float fat = (float) resultJson.optDouble("fat", 12.0);
-        String servingSize = resultJson.optString("servingSize", "1 Serving (~200g)");
-        float confidence = (float) resultJson.optDouble("confidence", 0.95);
-        String dietaryType = resultJson.optString("dietaryType", "VEGETARIAN");
-        String healthNotes = resultJson.optString("healthNotes", "Analyzed via Gemini Multimodal Vision.");
+        String servingSize = resultJson.optString("estimated_serving_size", resultJson.optString("servingSize", "1 Serving (~200g)"));
+        int servingGrams = resultJson.optInt("serving_weight_grams", 200);
+        float confidence = (float) resultJson.optDouble("confidence", 0.92);
+        String dietaryType = resultJson.optString("dietary_type", resultJson.optString("dietaryType", "VEGETARIAN"));
+        String explanation = resultJson.optString("explanation", resultJson.optString("healthNotes", "Analyzed via Gemini Vision Agent."));
 
-        List<String> ingredients = new ArrayList<>();
-        JSONArray ingArray = resultJson.optJSONArray("ingredients");
-        if (ingArray != null) {
-            for (int i = 0; i < ingArray.length(); i++) {
-                ingredients.add(ingArray.optString(i));
-            }
+        List<String> visible = jsonArrayToList(resultJson.optJSONArray("visible_ingredients"));
+        List<String> inferred = jsonArrayToList(resultJson.optJSONArray("inferred_ingredients"));
+        List<String> uncertain = jsonArrayToList(resultJson.optJSONArray("uncertain_ingredients"));
+
+        // Fallback for unified ingredients
+        List<String> allIngredients = new ArrayList<>();
+        allIngredients.addAll(visible);
+        allIngredients.addAll(inferred);
+        if (allIngredients.isEmpty()) {
+            allIngredients = jsonArrayToList(resultJson.optJSONArray("ingredients"));
         }
 
-        String label = foodName.toLowerCase().replaceAll("[^a-z0-9]+", "_");
+        String label = dishName.toLowerCase().replaceAll("[^a-z0-9]+", "_");
 
         PredictionResult pred = new PredictionResult(
                 label,
-                foodName,
+                dishName,
                 confidence,
                 calories,
                 protein,
@@ -284,12 +361,34 @@ public class GeminiVisionAgent {
                 servingSize,
                 "gemini_" + label
         );
-        pred.setIngredients(ingredients);
-        pred.setHealthNotes(healthNotes);
+        pred.setVisibleIngredients(visible);
+        pred.setInferredIngredients(inferred);
+        pred.setUncertainIngredients(uncertain);
+        pred.setIngredients(allIngredients);
         pred.setDietaryType(dietaryType);
+        pred.setHealthNotes(explanation);
+        pred.setExplanation(explanation);
         pred.setAiSource("GEMINI_AGENT");
+        pred.setServingWeightGrams(servingGrams);
+
+        // Store base nutrition per 100g for interactive serving recalculations
+        if (servingGrams > 0) {
+            double factor = 100.0 / servingGrams;
+            pred.setBaseNutrition(calories * factor, protein * factor, carbs * factor, fat * factor, servingGrams);
+        }
 
         return pred;
+    }
+
+    private List<String> jsonArrayToList(JSONArray array) {
+        List<String> list = new ArrayList<>();
+        if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+                String val = array.optString(i, "").trim();
+                if (!val.isEmpty()) list.add(val);
+            }
+        }
+        return list;
     }
 
     private String extractUserFriendlyError(int responseCode, String errorJson) {
@@ -297,11 +396,13 @@ public class GeminiVisionAgent {
             if (errorJson != null && errorJson.contains("API_KEY_INVALID")) {
                 return "Invalid Google Gemini API key. Please check your key at aistudio.google.com";
             }
-            return "Gemini API authentication failed (" + responseCode + "). Please re-check your Gemini API key.";
+            return "Gemini API authentication failed (HTTP " + responseCode + "). Please verify your Gemini API key.";
         } else if (responseCode == 429) {
-            return "Gemini API rate limit reached. Please wait a few moments and try again.";
+            return "Gemini API quota or rate limit exceeded. Please wait a few moments and retry.";
+        } else if (responseCode >= 500) {
+            return "Google Gemini AI service is momentarily unavailable (" + responseCode + "). Please retry.";
         }
-        return "Gemini API error (" + responseCode + "): " + (errorJson != null && errorJson.length() < 120 ? errorJson : "Please retry.");
+        return "Gemini API error (" + responseCode + ").";
     }
 
     private String readStream(InputStream is) throws Exception {
