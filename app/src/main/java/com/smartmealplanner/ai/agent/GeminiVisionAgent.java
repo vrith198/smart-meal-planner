@@ -43,10 +43,10 @@ public class GeminiVisionAgent {
 
     // Supported multimodal models with automatic fallback
     private static final String[] CANDIDATE_MODELS = new String[] {
-            "gemini-1.5-flash",
-            "gemini-1.5-flash-latest",
+            "gemini-3.8-flash",
+            "gemini-3.5-flash",
             "gemini-2.0-flash",
-            "gemini-1.5-pro"
+            "gemini-1.5-flash"
     };
 
     private static final String BASE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
@@ -69,17 +69,18 @@ public class GeminiVisionAgent {
 
     /**
      * Retrieves the Gemini API key, giving priority to runtime user-entered key,
-     * then falling back to BuildConfig.GEMINI_API_KEY.
+     * then falling back to BuildConfig.GEMINI_API_KEY, and lastly the integrated key.
      */
     public static String getApiKey(Context context) {
-        if (context == null) return "";
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        String userKey = prefs.getString(KEY_GEMINI_API_KEY, "").trim();
-        if (!userKey.isEmpty()) {
-            return userKey;
+        if (context != null) {
+            SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            String userKey = prefs.getString(KEY_GEMINI_API_KEY, "").trim();
+            if (!userKey.isEmpty()) {
+                return userKey;
+            }
         }
 
-        // Fallback to local untracked build configuration (local.properties)
+        // Fallback to local untracked build configuration (local.properties -> BuildConfig.GEMINI_API_KEY)
         try {
             if (BuildConfig.GEMINI_API_KEY != null && !BuildConfig.GEMINI_API_KEY.trim().isEmpty()) {
                 return BuildConfig.GEMINI_API_KEY.trim();
@@ -364,13 +365,13 @@ public class GeminiVisionAgent {
         JSONObject resultJson = new JSONObject(rawText);
 
         String dishName = resultJson.optString("dish_name", resultJson.optString("foodName", "Identified Meal"));
-        int calories = resultJson.optInt("calories", 350);
-        float protein = (float) resultJson.optDouble("protein", 10.0);
-        float carbs = (float) resultJson.optDouble("carbs", 45.0);
-        float fat = (float) resultJson.optDouble("fat", 12.0);
+        int calories = parseFlexibleInt(resultJson, "calories", 350);
+        float protein = parseFlexibleFloat(resultJson, "protein", 10.0f);
+        float carbs = parseFlexibleFloat(resultJson, "carbs", 45.0f);
+        float fat = parseFlexibleFloat(resultJson, "fat", 12.0f);
         String servingSize = resultJson.optString("estimated_serving_size", resultJson.optString("servingSize", "1 Serving (~200g)"));
-        int servingGrams = resultJson.optInt("serving_weight_grams", 200);
-        float confidence = (float) resultJson.optDouble("confidence", 0.92);
+        int servingGrams = parseFlexibleInt(resultJson, "serving_weight_grams", 200);
+        float confidence = parseFlexibleFloat(resultJson, "confidence", 0.95f);
         String dietaryType = resultJson.optString("dietary_type", resultJson.optString("dietaryType", "VEGETARIAN"));
         String explanation = resultJson.optString("explanation", resultJson.optString("healthNotes", "Analyzed via Gemini Vision Agent."));
 
@@ -453,5 +454,37 @@ public class GeminiVisionAgent {
             }
         }
         return sb.toString();
+    }
+
+    private static int parseFlexibleInt(JSONObject json, String key, int defaultVal) {
+        if (!json.has(key)) return defaultVal;
+        try {
+            return json.optInt(key, defaultVal);
+        } catch (Exception e) {
+            try {
+                String str = json.optString(key, "");
+                String numStr = str.replaceAll("[^0-9]", "").trim();
+                if (!numStr.isEmpty()) {
+                    return Integer.parseInt(numStr);
+                }
+            } catch (Exception ignored) {}
+        }
+        return defaultVal;
+    }
+
+    private static float parseFlexibleFloat(JSONObject json, String key, float defaultVal) {
+        if (!json.has(key)) return defaultVal;
+        try {
+            return (float) json.optDouble(key, defaultVal);
+        } catch (Exception e) {
+            try {
+                String str = json.optString(key, "");
+                String numStr = str.replaceAll("[^0-9.]", "").trim();
+                if (!numStr.isEmpty()) {
+                    return Float.parseFloat(numStr);
+                }
+            } catch (Exception ignored) {}
+        }
+        return defaultVal;
     }
 }

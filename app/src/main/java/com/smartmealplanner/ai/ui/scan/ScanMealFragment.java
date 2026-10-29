@@ -451,11 +451,15 @@ public class ScanMealFragment extends Fragment {
         layoutPredictions.setVisibility(View.GONE);
         layoutGeminiLoading.setVisibility(View.GONE);
 
-        // Run local inference in background thread
+        // 1. Immediately run on-device inference as baseline
         AppDatabase.databaseWriteExecutor.execute(() -> {
             currentPredictions = foodClassifier.recognizeFood(bitmap, 3);
             if (getActivity() != null) {
-                getActivity().runOnUiThread(() -> displayPredictions(currentPredictions));
+                getActivity().runOnUiThread(() -> {
+                    displayPredictions(currentPredictions);
+                    // 2. Automatically trigger Gemini Vision for authoritative deep multimodal verdict!
+                    triggerGeminiAnalysis();
+                });
             }
         });
     }
@@ -577,7 +581,29 @@ public class ScanMealFragment extends Fragment {
     private void displayGeminiPrediction(PredictionResult p) {
         this.activePrediction = p;
         renderActiveNutritionUI(p);
-        Toast.makeText(getContext(), "✨ Gemini Vision Agent analyzed " + p.getDisplayName() + " (" + p.getCalories() + " kcal)!", Toast.LENGTH_LONG).show();
+
+        if (tvPred1Name != null) {
+            tvPred1Name.setText("1. " + p.getDisplayName() + " (" + p.getCalories() + " kcal)");
+        }
+        if (tvPred1Conf != null) {
+            tvPred1Conf.setText(p.getConfidencePercentage() + "%");
+        }
+        if (pbPred1 != null) {
+            pbPred1.setProgress(p.getConfidencePercentage());
+        }
+
+        if (allCatalogFoods != null) {
+            String cleanName = p.getDisplayName().toLowerCase();
+            for (int i = 0; i < allCatalogFoods.size(); i++) {
+                FoodItemEntity food = allCatalogFoods.get(i);
+                if (food.name != null && (cleanName.contains(food.name.toLowerCase()) || food.name.toLowerCase().contains(cleanName))) {
+                    spinnerCorrection.setSelection(i);
+                    break;
+                }
+            }
+        }
+
+        Toast.makeText(getContext(), "✨ Gemini AI detected " + p.getDisplayName() + " (" + p.getCalories() + " kcal)!", Toast.LENGTH_SHORT).show();
     }
 
     private void renderActiveNutritionUI(PredictionResult p) {
