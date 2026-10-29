@@ -43,10 +43,10 @@ public class GeminiVisionAgent {
 
     // Supported multimodal models with automatic fallback
     private static final String[] CANDIDATE_MODELS = new String[] {
-            "gemini-3.8-flash",
+            "gemini-3.1-flash-lite",
+            "gemini-3.5-flash-lite",
             "gemini-3.5-flash",
-            "gemini-2.0-flash",
-            "gemini-1.5-flash"
+            "gemini-3.8-flash"
     };
 
     private static final String BASE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/";
@@ -171,12 +171,12 @@ public class GeminiVisionAgent {
                             String sanitizedError = errorStr != null ? errorStr.replaceAll("key=[^&\\s\"]+", "key=REDACTED") : "";
                             Log.w(TAG, "Gemini API [" + modelName + "] error (" + responseCode + "): " + sanitizedError);
 
-                            if (responseCode == 404) {
-                                // Try next candidate model
-                                lastError = "Model " + modelName + " not available on this API tier.";
+                            lastError = extractUserFriendlyError(responseCode, sanitizedError);
+                            // Resilient fallback: On quota exhausted (429), model unavailable (404), or server spike (500/503), try next model!
+                            if (responseCode == 404 || responseCode == 429 || responseCode == 500 || responseCode == 503) {
+                                Log.i(TAG, "Model " + modelName + " returned HTTP " + responseCode + "; falling over to next candidate model.");
                                 continue;
                             } else {
-                                lastError = extractUserFriendlyError(responseCode, sanitizedError);
                                 break;
                             }
                         }
@@ -276,15 +276,24 @@ public class GeminiVisionAgent {
         // Prompt instructing structured schema with clear separation of visible vs inferred ingredients
         JSONObject textPart = new JSONObject();
         String prompt = "You are an expert clinical dietitian and computer vision agent for smart meal planning.\n"
-                + "Analyze this meal photograph carefully. Accurately detect common global and regional foods including Indian dishes (such as Idli, Dal Rice, Dosa, Roti, Chapati, Biryani, Samosa, Curry, Paneer) as well as Pizza, Burger, Salad, French Fries, Pasta, etc.:\n"
-                + "1. Identify the likely main dish with a clean, recognizable name (e.g., 'Idli with Chutney', 'Yellow Dal with Steamed Rice', 'Margherita Pizza', 'Veggie Burger', 'Masala Dosa').\n"
+                + "Compare the image carefully to real-world visual characteristics and identify the exact food item:\n"
+                + "- Masala Dosa / Plain Dosa: Thin, crispy golden-brown Indian crepe (rolled, folded, or conical), often served with coconut chutney & sambar. Not a burger, not bread.\n"
+                + "- Samosa: Golden-yellow, crispy deep-fried triangular pastry filled with spiced potatoes & peas. Not a salad, not a burger.\n"
+                + "- Burger / Veggie Burger: Sandwich made of a sliced round bun with an inner patty, lettuce, cheese, or tomato.\n"
+                + "- Caesar Salad / Green Salad: Fresh green leafy bowl with romaine lettuce, dressing, croutons, or parmesan. (Must have visible green leaves).\n"
+                + "- Idli: Round, white, steamed fluffy spongy rice-lentil cakes, often with chutney.\n"
+                + "- Yellow Dal with Steamed Rice (Dal Rice): Yellow lentil soup/curry served with or on steamed white rice.\n"
+                + "- Pizza: Flat baked crust with tomato sauce, melted cheese, and toppings.\n"
+                + "- French Fries: Cut golden-yellow deep-fried potato sticks.\n\n"
+                + "Tasks:\n"
+                + "1. Identify the dish name cleanly and accurately (e.g. 'Veggie Burger', 'Samosa', 'Plain Dosa', 'Caesar Salad', 'Idli with Chutney', 'Yellow Dal with Steamed Rice', 'Pizza', 'French Fries').\n"
                 + "2. Identify visible ingredients that can actually be visually seen in the image.\n"
                 + "3. Identify recipe-inferred ingredients typical to this dish but not directly visible.\n"
                 + "4. List uncertain or optional ingredients.\n"
                 + "5. Estimate standard portion description and serving weight in grams.\n"
                 + "6. Estimate calories (kcal) and macronutrients (protein, carbs, fat in grams) accurately based on standard nutritional data.\n"
                 + "7. Classify dietary type: 'VEGETARIAN', 'NON_VEGETARIAN', or 'VEGAN'.\n"
-                + "8. Provide a concise explanation describing the dish and assumptions.\n\n"
+                + "8. Provide a concise explanation describing why you identified this dish.\n\n"
                 + "Respond STRICTLY with a valid JSON object matching this schema:\n"
                 + "{\n"
                 + "  \"dish_name\": \"Name of Dish\",\n"
@@ -293,13 +302,13 @@ public class GeminiVisionAgent {
                 + "  \"uncertain_ingredients\": [\"item 5\"],\n"
                 + "  \"estimated_serving_size\": \"1 plate (~250g)\",\n"
                 + "  \"serving_weight_grams\": 250,\n"
-                + "  \"calories\": 420,\n"
-                + "  \"protein\": 14.0,\n"
-                + "  \"carbs\": 58.0,\n"
+                + "  \"calories\": 350,\n"
+                + "  \"protein\": 10.0,\n"
+                + "  \"carbs\": 45.0,\n"
                 + "  \"fat\": 12.0,\n"
                 + "  \"confidence\": 0.95,\n"
                 + "  \"dietary_type\": \"VEGETARIAN\",\n"
-                + "  \"explanation\": \"Standard home-cooked portion. Values are estimates.\"\n"
+                + "  \"explanation\": \"Visual cues match ...\"\n"
                 + "}";
         textPart.put("text", prompt);
         partsArray.put(textPart);

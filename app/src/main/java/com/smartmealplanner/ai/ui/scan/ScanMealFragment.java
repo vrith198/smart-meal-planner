@@ -449,19 +449,15 @@ public class ScanMealFragment extends Fragment {
         layoutEmptyPreview.setVisibility(View.GONE);
         pbInference.setVisibility(View.VISIBLE);
         layoutPredictions.setVisibility(View.GONE);
-        layoutGeminiLoading.setVisibility(View.GONE);
+        if (layoutGeminiLoading != null) {
+            layoutGeminiLoading.setVisibility(View.VISIBLE);
+        }
+        if (tvGeminiLoadingStatus != null) {
+            tvGeminiLoadingStatus.setText("✨ Comparing & identifying meal with Google Gemini AI...");
+        }
 
-        // 1. Immediately run on-device inference as baseline
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            currentPredictions = foodClassifier.recognizeFood(bitmap, 3);
-            if (getActivity() != null) {
-                getActivity().runOnUiThread(() -> {
-                    displayPredictions(currentPredictions);
-                    // 2. Automatically trigger Gemini Vision for authoritative deep multimodal verdict!
-                    triggerGeminiAnalysis();
-                });
-            }
-        });
+        // Process directly with Google Gemini AI before displaying output as requested
+        triggerGeminiAnalysis();
     }
 
     private void displayPredictions(List<PredictionResult> predictions) {
@@ -552,6 +548,7 @@ public class ScanMealFragment extends Fragment {
     private void triggerGeminiAnalysis() {
         if (currentBitmap == null || getContext() == null) return;
 
+        pbInference.setVisibility(View.VISIBLE);
         if (layoutGeminiLoading != null) {
             layoutGeminiLoading.setVisibility(View.VISIBLE);
         }
@@ -563,17 +560,32 @@ public class ScanMealFragment extends Fragment {
             @Override
             public void onSuccess(PredictionResult result) {
                 if (getActivity() == null) return;
+                pbInference.setVisibility(View.GONE);
                 if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
                 if (btnAnalyzeWithGemini != null) btnAnalyzeWithGemini.setEnabled(true);
+                layoutPredictions.setVisibility(View.VISIBLE);
                 displayGeminiPrediction(result);
             }
 
             @Override
             public void onError(String errorMessage) {
                 if (getActivity() == null) return;
-                if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
-                if (btnAnalyzeWithGemini != null) btnAnalyzeWithGemini.setEnabled(true);
-                Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
+                Log.w(TAG, "Gemini multimodal processing note: " + errorMessage + "; falling back to on-device engine.");
+
+                // Offline / connectivity fallback: run calibrated on-device engine
+                AppDatabase.databaseWriteExecutor.execute(() -> {
+                    currentPredictions = foodClassifier.recognizeFood(currentBitmap, 3);
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            pbInference.setVisibility(View.GONE);
+                            if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
+                            if (btnAnalyzeWithGemini != null) btnAnalyzeWithGemini.setEnabled(true);
+                            layoutPredictions.setVisibility(View.VISIBLE);
+                            displayPredictions(currentPredictions);
+                            Toast.makeText(getContext(), "AI: " + errorMessage + " (using on-device fallback)", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                });
             }
         });
     }
@@ -590,6 +602,9 @@ public class ScanMealFragment extends Fragment {
         }
         if (pbPred1 != null) {
             pbPred1.setProgress(p.getConfidencePercentage());
+        }
+        if (tvLowConfidenceWarning != null) {
+            tvLowConfidenceWarning.setVisibility(View.GONE);
         }
 
         if (allCatalogFoods != null) {

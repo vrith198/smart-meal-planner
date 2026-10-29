@@ -351,14 +351,12 @@ public class FoodClassifier {
         float botG = (vec[43] + vec[46] + vec[49] + vec[52]) / 4.0f;
         float botB = (vec[44] + vec[47] + vec[50] + vec[53]) / 4.0f;
 
-        boolean hasTopBun = (topR > 0.38f && topR > topG && topG > topB && topG < topR * 0.95f);
-        boolean hasMidFillings = (greenness > 0.03f || yellowness > 0.12f || (midG > topG * 0.90f && midR > 0.35f));
-        boolean hasPattyBelow = (botR < topR * 1.05f || (botR > botG && botG > botB));
+        float verticalVariance = Math.abs(topR - midR) + Math.abs(midR - botR) + Math.abs(topG - midG) + Math.abs(midG - botG);
 
         // 3. Autonomous Structural Inspection:
 
-        // A. Caesar / Leafy Salad (Genuinely green leafy content with dressing)
-        boolean isSalad = (greenness > 0.10f || (gMean > bMean * 1.25f && greenness > 0.06f));
+        // A. Caesar / Leafy Salad (Must have visible green leafy content)
+        boolean isSalad = (greenness > 0.08f && gMean > bMean * 1.20f);
         if (isSalad) {
             as_ *= (40.0f + greenness * 40.0f);
             aDalRice *= 0.001f;
@@ -366,49 +364,76 @@ public class FoodClassifier {
             aBurger *= 0.001f;
             ap *= 0.001f;
             af *= 0.001f;
+            aSamosa *= 0.001f;
+            aDosa *= 0.001f;
             aIdli *= 0.001f;
             aRice *= 0.001f;
+        } else {
+            // Food has minimal/no green leaves: cannot be Caesar or green salad!
+            as_ *= 0.001f;
         }
 
         // B. Steamed Idli (Pure white/pale neutral spongy circular cakes)
-        boolean isIdli = (avgBrightness > 0.40f && colorSpread < 0.15f && greenness < 0.05f && yellowness < 0.04f);
+        boolean isIdli = (avgBrightness > 0.45f && colorSpread < 0.15f && greenness < 0.04f && yellowness < 0.06f);
         if (isIdli && !isSalad) {
             aIdli *= 50.0f;
             aRice *= 10.0f;
             aDalRice *= 0.001f;
             aDal *= 0.001f;
-            as_ *= 0.001f;
             aBurger *= 0.001f;
+            aSamosa *= 0.001f;
+            aDosa *= 0.001f;
             ap *= 0.001f;
             af *= 0.001f;
         }
 
-        // C. Stacked Burger / Sandwich
-        if (hasTopBun && hasMidFillings && hasPattyBelow && greenness < 0.20f && !isSalad && !isIdli) {
+        // C. Crispy Plain / Masala Dosa (Large uniform golden-brown crepe, flat, low vertical variance)
+        boolean isDosa = (rMean > 0.45f && gMean > 0.34f && bMean < 0.30f && yellowness > 0.08f &&
+                          greenness < 0.04f && verticalVariance < 0.10f && !isSalad && !isIdli);
+        if (isDosa) {
+            aDosa *= 45.0f;
+            aBurger *= 0.01f;
+            aDalRice *= 0.05f;
+            aDal *= 0.05f;
+        }
+
+        // D. Crispy Samosa (Golden-yellow deep fried triangular pastry)
+        boolean isSamosa = (yellowness > 0.12f && rMean > 0.48f && gMean > 0.34f && bMean < 0.28f &&
+                            greenness < 0.03f && !isSalad && !isIdli && !isDosa);
+        if (isSamosa) {
+            aSamosa *= 45.0f;
+            aBurger *= 0.02f;
+            aDalRice *= 0.05f;
+            aDal *= 0.05f;
+        }
+
+        // E. Stacked Burger / Sandwich (Requires multi-layer stratification: buns, fillings, patty)
+        boolean isBurger = (verticalVariance >= 0.10f && topR > topG && topG > topB &&
+                            (greenness > 0.02f || redness > 0.08f || yellowness > 0.10f) &&
+                            botR < topR * 1.05f && !isSalad && !isIdli && !isDosa && !isSamosa);
+        if (isBurger) {
             aBurger *= 45.0f;
-            as_ *= 0.001f;
             aDalRice *= 0.001f;
             aDal *= 0.001f;
         }
 
-        // D. Pizza (Flat circular crust with red sauce & melted cheese)
-        if ((redness > 0.25f || (rMean > gMean * 1.15f && rMean > bMean * 1.20f)) && avgBrightness > 0.38f && yellowness < 0.18f && !isSalad && !isIdli && !hasTopBun) {
+        // F. Pizza (Flat circular crust with red sauce & melted cheese)
+        if ((redness > 0.20f || (rMean > gMean * 1.15f && rMean > bMean * 1.20f)) &&
+            avgBrightness > 0.36f && !isSalad && !isIdli && !isBurger) {
             ap *= 45.0f;
-            as_ *= 0.001f;
             aDalRice *= 0.001f;
             aDal *= 0.001f;
         }
 
-        // E. French Fries (Golden yellow strips, high r/b and g/b, low blue < 0.22)
-        if (yellowness > 0.12f && rMean > bMean * 1.8f && bMean < 0.22f && greenness < 0.04f && !isSalad && !isIdli && !hasTopBun) {
+        // G. French Fries (Golden yellow strips, high r/b and g/b, low blue < 0.22)
+        if (yellowness > 0.12f && rMean > bMean * 1.7f && bMean < 0.24f && greenness < 0.03f &&
+            !isSalad && !isIdli && !isBurger && !isDosa) {
             af *= 45.0f;
-            aSamosa *= 4.0f;
-            as_ *= 0.001f;
             aDalRice *= 0.001f;
         }
 
-        // F. Yellow Dal / Dal Rice (Turmeric yellow lentil gravy or Dal served over white rice)
-        if (yellowness > 0.14f && greenness < 0.06f && !isSalad && !isIdli && !hasTopBun) {
+        // H. Yellow Dal / Dal Rice (Turmeric yellow lentil gravy or Dal served over white rice)
+        if (yellowness > 0.14f && greenness < 0.05f && !isSalad && !isIdli && !isBurger && !isDosa && !isSamosa) {
             if (avgBrightness > 0.38f) {
                 // Combination of yellow dal gravy + white rice grains
                 aDalRice *= 50.0f;
@@ -419,34 +444,23 @@ public class FoodClassifier {
                 aDal *= 45.0f;
                 aDalRice *= 20.0f;
             }
-            as_ *= 0.001f;
             aBurger *= 0.001f;
             ap *= 0.001f;
             af *= 0.001f;
         }
 
-        // G. Fragrant Biryani (Spiced yellow/orange rice with visible grains)
-        if (rMean > 0.50f && gMean > 0.38f && yellowness > 0.15f && redness > 0.15f && greenness < 0.05f && !isSalad && !isIdli && !hasTopBun) {
+        // I. Fragrant Biryani (Spiced yellow/orange rice with visible grains)
+        if (rMean > 0.50f && gMean > 0.38f && yellowness > 0.15f && redness > 0.15f && greenness < 0.04f && !isSalad && !isIdli) {
             aBiryani *= 40.0f;
         }
 
-        // H. Crispy Potato Samosa (Golden triangular pastry)
-        if (yellowness > 0.14f && redness > 0.25f && greenness < 0.04f && !isSalad && !isIdli && !hasTopBun) {
-            aSamosa *= 35.0f;
-        }
-
-        // I. Crispy Plain Dosa (Golden brown large crepe)
-        if (rMean > 0.48f && gMean > 0.36f && yellowness > 0.10f && greenness < 0.04f && !isSalad && !isIdli && !hasTopBun) {
-            aDosa *= 35.0f;
-        }
-
         // J. Whole Wheat Roti (Flat round tan/brown flatbread)
-        if (rMean > 0.45f && gMean > 0.35f && greenness < 0.04f && !isSalad && !isIdli && !hasTopBun) {
+        if (rMean > 0.45f && gMean > 0.35f && greenness < 0.03f && verticalVariance < 0.08f && !isSalad && !isIdli && !isDosa) {
             aRoti *= 30.0f;
         }
 
         // K. Steamed Basmati Rice
-        if (avgBrightness > 0.55f && colorSpread < 0.16f && yellowness < 0.06f && greenness < 0.04f && !isSalad && !isIdli) {
+        if (avgBrightness > 0.55f && colorSpread < 0.16f && yellowness < 0.06f && greenness < 0.03f && !isSalad && !isIdli) {
             aRice *= 25.0f;
         }
 
@@ -601,9 +615,12 @@ public class FoodClassifier {
             float b = (p & 0xFF) / 255.0f;
 
             sumR += r; sumG += g; sumB += b;
-            if (g > r * 0.90f && g > b * 1.10f && g > 0.25f) greenCount++;
-            if (r > g * 1.20f && r > b * 1.20f) redCount++;
-            if (r > 0.40f && g > 0.30f && b < 0.25f) yellowCount++;
+            // True leafy green: Green must be dominant over both Red and Blue
+            if (g > r * 1.15f && g > b * 1.15f && g > 0.18f) greenCount++;
+            // True tomato/sauce red: Red must be dominant over Green and Blue
+            if (r > g * 1.25f && r > b * 1.25f && r > 0.25f) redCount++;
+            // True golden/turmeric yellow: High red & green, low blue, close r and g
+            if (r > 0.38f && g > 0.30f && b < 0.28f && r > b * 1.4f && Math.abs(r - g) < 0.22f) yellowCount++;
         }
 
         float rMean = sumR / 256.0f;
