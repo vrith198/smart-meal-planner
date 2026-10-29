@@ -358,10 +358,12 @@ public class FoodClassifier {
         // 3. Autonomous Structural Inspection:
 
         // A. Steamed Idli (Pure white/pale neutral spongy circular cakes)
-        boolean isIdli = (avgBrightness > 0.40f && colorSpread < 0.22f && greenness < 0.12f);
+        boolean isIdli = (avgBrightness > 0.40f && colorSpread < 0.18f && greenness < 0.12f && yellowness < 0.06f);
         if (isIdli) {
-            aIdli *= 45.0f;
-            aRice *= 15.0f;
+            aIdli *= 50.0f;
+            aRice *= 10.0f;
+            aDalRice *= 0.001f;
+            aDal *= 0.001f;
             as_ *= 0.001f;
             aBurger *= 0.001f;
             ap *= 0.001f;
@@ -369,18 +371,19 @@ public class FoodClassifier {
         }
 
         // B. Yellow Dal / Dal Rice (Turmeric yellow lentil gravy or Dal served over white rice)
-        boolean hasYellowDal = (yellowness > 0.08f || (rMean > 0.38f && gMean > 0.28f && rMean > bMean + 0.05f)) && greenness < 0.14f;
+        boolean hasYellowDal = (yellowness > 0.07f || (rMean > 0.36f && gMean > 0.26f && rMean > bMean + 0.05f)) && greenness < 0.14f && !isIdli;
         if (hasYellowDal) {
-            if (avgBrightness > 0.42f) {
+            if (avgBrightness > 0.40f) {
                 // Combination of yellow dal gravy + white rice grains
-                aDalRice *= 50.0f;
+                aDalRice *= 60.0f;
                 aDal *= 25.0f;
-                aRice *= 20.0f;
+                aRice *= 15.0f;
             } else {
                 // Dal gravy bowl
-                aDal *= 45.0f;
+                aDal *= 50.0f;
                 aDalRice *= 25.0f;
             }
+            aIdli *= 0.001f;
             as_ *= 0.001f;
             aBurger *= 0.001f;
             ap *= 0.001f;

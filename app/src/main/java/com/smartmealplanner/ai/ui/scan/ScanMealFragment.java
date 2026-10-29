@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -38,13 +40,22 @@ import com.smartmealplanner.ai.agent.GeminiVisionAgent;
 import com.smartmealplanner.ai.model.PredictionResult;
 import com.smartmealplanner.ai.ui.analysis.MealAnalysisActivity;
 
-import android.widget.EditText;
-import android.widget.FrameLayout;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.util.Log;
+import androidx.core.content.FileProvider;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ScanMealFragment extends Fragment {
+
+    private static final String TAG = "ScanMealFragment";
 
     private ImageView ivPreview;
     private View layoutEmptyPreview;
@@ -76,7 +87,6 @@ public class ScanMealFragment extends Fragment {
     // Gemini Multimodal Vision Agent Views
     private View layoutGeminiAgentRow;
     private MaterialButton btnAnalyzeWithGemini;
-    private MaterialButton btnGeminiKeySettings;
     private View layoutGeminiLoading;
     private TextView tvGeminiLoadingStatus;
 
@@ -97,10 +107,12 @@ public class ScanMealFragment extends Fragment {
     private List<FoodItemEntity> allCatalogFoods = new ArrayList<>();
     private List<PredictionResult> currentPredictions = new ArrayList<>();
 
-    // Activity Result Launchers
-    private ActivityResultLauncher<Void> cameraLauncher;
+    // Robust Camera & Gallery Capture
+    private ActivityResultLauncher<Uri> cameraLauncher;
     private ActivityResultLauncher<String> cameraPermissionLauncher;
     private ActivityResultLauncher<String> galleryLauncher;
+    private Uri currentPhotoUri;
+    private File currentPhotoFile;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -114,7 +126,7 @@ public class ScanMealFragment extends Fragment {
                 } else {
                     if (getContext() != null) {
                         Toast.makeText(getContext(),
-                            "Camera permission is required to capture meal photos. You can also pick from gallery or tap sample foods below.",
+                            "Camera permission is required to capture meal photos.",
                             Toast.LENGTH_LONG).show();
                     }
                 }
@@ -122,10 +134,23 @@ public class ScanMealFragment extends Fragment {
         );
 
         cameraLauncher = registerForActivityResult(
-            new ActivityResultContracts.TakePicturePreview(),
-            bitmap -> {
-                if (bitmap != null) {
-                    processCapturedImage(bitmap);
+            new ActivityResultContracts.TakePicture(),
+            isSuccess -> {
+                if (Boolean.TRUE.equals(isSuccess)) {
+                    Bitmap bitmap = null;
+                    if (currentPhotoFile != null && currentPhotoFile.exists()) {
+                        bitmap = decodeAndOrientBitmap(currentPhotoFile.getAbsolutePath());
+                    }
+                    if (bitmap == null && currentPhotoUri != null) {
+                        bitmap = decodeUriWithOrientation(currentPhotoUri);
+                    }
+                    if (bitmap != null) {
+                        processCapturedImage(bitmap);
+                    } else {
+                        if (getContext() != null) {
+                            Toast.makeText(getContext(), "Could not process captured photo. Please try again.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 }
             }
         );
@@ -135,7 +160,7 @@ public class ScanMealFragment extends Fragment {
             uri -> {
                 if (uri != null && getContext() != null) {
                     try {
-                        Bitmap bitmap = decodeUriToBitmap(uri);
+                        Bitmap bitmap = decodeUriWithOrientation(uri);
                         if (bitmap != null) {
                             processCapturedImage(bitmap);
                         } else {
@@ -160,13 +185,120 @@ public class ScanMealFragment extends Fragment {
     }
 
     private void launchCamera() {
+        if (getContext() == null) return;
         try {
-            cameraLauncher.launch(null);
+            currentPhotoFile = createImageFile();
+            if (currentPhotoFile != null) {
+                currentPhotoUri = FileProvider.getUriForFile(
+                    requireContext(),
+                    requireContext().getPackageName() + ".fileprovider",
+                    currentPhotoFile
+                );
+                cameraLauncher.launch(currentPhotoUri);
+            }
         } catch (Exception e) {
+            Log.e(TAG, "Error launching camera: " + e.getMessage(), e);
             if (getContext() != null) {
                 Toast.makeText(getContext(), "Could not open camera: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "MEAL_" + timeStamp + "_";
+        File storageDir = requireContext().getCacheDir();
+        return File.createTempFile(imageFileName, ".jpg", storageDir);
+    }
+
+    private Bitmap decodeAndOrientBitmap(String filePath) {
+        try {
+            File file = new File(filePath);
+            if (!file.exists() || file.length() == 0) return null;
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(filePath, options);
+
+            int maxDim = Math.max(options.outWidth, options.outHeight);
+            int sampleSize = 1;
+            while (maxDim / sampleSize > 1280) {
+                sampleSize *= 2;
+            }
+
+            options.inJustDecodeBounds = false;
+            options.inSampleSize = sampleSize;
+            Bitmap bitmap = BitmapFactory.decodeFile(filePath, options);
+            if (bitmap == null) return null;
+
+            ExifInterface exif = new ExifInterface(filePath);
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            return rotateBitmapIfRequired(bitmap, orientation);
+        } catch (Exception e) {
+            Log.e(TAG, "decodeAndOrientBitmap error: " + e.getMessage(), e);
+            return null;
+        }
+    }
+
+    private Bitmap decodeUriWithOrientation(Uri uri) {
+        if (getContext() == null || uri == null) return null;
+        try {
+            int orientation = ExifInterface.ORIENTATION_NORMAL;
+            try (InputStream is = getContext().getContentResolver().openInputStream(uri)) {
+                if (is != null) {
+                    ExifInterface exif = new ExifInterface(is);
+                    orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                }
+            } catch (Exception ignored) {}
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            try (InputStream is = getContext().getContentResolver().openInputStream(uri)) {
+                BitmapFactory.decodeStream(is, null, options);
+            }
+            int maxDim = Math.max(options.outWidth, options.outHeight);
+            int sampleSize = 1;
+            while (maxDim / sampleSize > 1280) {
+                sampleSize *= 2;
+            }
+
+            options.inJustDecodeBounds = false;
+            options.inSampleSize = sampleSize;
+            Bitmap bitmap;
+            try (InputStream is = getContext().getContentResolver().openInputStream(uri)) {
+                bitmap = BitmapFactory.decodeStream(is, null, options);
+            }
+
+            return rotateBitmapIfRequired(bitmap, orientation);
+        } catch (Exception e) {
+            Log.e(TAG, "decodeUriWithOrientation error: " + e.getMessage(), e);
+            return null;
+        }
+    }
+
+    private Bitmap rotateBitmapIfRequired(Bitmap bitmap, int orientation) {
+        if (bitmap == null) return null;
+        int rotationDegrees = 0;
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                rotationDegrees = 90;
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                rotationDegrees = 180;
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                rotationDegrees = 270;
+                break;
+            default:
+                return bitmap;
+        }
+        Matrix matrix = new Matrix();
+        matrix.postRotate(rotationDegrees);
+        Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        if (rotated != bitmap) {
+            bitmap.recycle();
+        }
+        return rotated;
     }
 
     private void loadSampleFood(String assetFileName) {
@@ -180,36 +312,6 @@ public class ScanMealFragment extends Fragment {
             }
         } catch (Exception e) {
             Toast.makeText(getContext(), "Failed to load sample: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private Bitmap decodeUriToBitmap(Uri uri) {
-        if (getContext() == null || uri == null) return null;
-        try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                android.graphics.ImageDecoder.Source source = 
-                    android.graphics.ImageDecoder.createSource(getContext().getContentResolver(), uri);
-                return android.graphics.ImageDecoder.decodeBitmap(source, (decoder, info, s) -> {
-                    decoder.setAllocator(android.graphics.ImageDecoder.ALLOCATOR_SOFTWARE);
-                    int maxDim = Math.max(info.getSize().getWidth(), info.getSize().getHeight());
-                    if (maxDim > 1024) {
-                        decoder.setTargetSampleSize(Math.max(1, maxDim / 1024));
-                    }
-                });
-            } else {
-                java.io.InputStream input = getContext().getContentResolver().openInputStream(uri);
-                android.graphics.BitmapFactory.Options options = new android.graphics.BitmapFactory.Options();
-                options.inSampleSize = 2;
-                Bitmap bmp = android.graphics.BitmapFactory.decodeStream(input, null, options);
-                if (input != null) input.close();
-                return bmp;
-            }
-        } catch (Exception e) {
-            try {
-                return MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
-            } catch (Exception ex) {
-                return null;
-            }
         }
     }
 
@@ -286,12 +388,10 @@ public class ScanMealFragment extends Fragment {
 
         layoutGeminiAgentRow = v.findViewById(R.id.layoutGeminiAgentRow);
         btnAnalyzeWithGemini = v.findViewById(R.id.btnAnalyzeWithGemini);
-        btnGeminiKeySettings = v.findViewById(R.id.btnGeminiKeySettings);
         layoutGeminiLoading = v.findViewById(R.id.layoutGeminiLoading);
         tvGeminiLoadingStatus = v.findViewById(R.id.tvGeminiLoadingStatus);
 
         btnAnalyzeWithGemini.setOnClickListener(view -> onAnalyzeWithGeminiClicked());
-        btnGeminiKeySettings.setOnClickListener(view -> showApiKeyInputDialog(null));
 
         tvLowConfidenceWarning = v.findViewById(R.id.tvLowConfidenceWarning);
         spinnerCorrection = v.findViewById(R.id.spinnerFoodCorrection);
@@ -442,12 +542,7 @@ public class ScanMealFragment extends Fragment {
             Toast.makeText(getContext(), "Please capture or choose a meal photo first.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        if (!GeminiVisionAgent.hasApiKey(getContext())) {
-            showApiKeyInputDialog(this::triggerGeminiAnalysis);
-        } else {
-            triggerGeminiAnalysis();
-        }
+        triggerGeminiAnalysis();
     }
 
     private void triggerGeminiAnalysis() {
@@ -474,12 +569,7 @@ public class ScanMealFragment extends Fragment {
                 if (getActivity() == null) return;
                 if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
                 if (btnAnalyzeWithGemini != null) btnAnalyzeWithGemini.setEnabled(true);
-
-                if ("API_KEY_REQUIRED".equals(errorMessage)) {
-                    showApiKeyInputDialog(ScanMealFragment.this::triggerGeminiAnalysis);
-                } else {
-                    Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
-                }
+                Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -625,66 +715,6 @@ public class ScanMealFragment extends Fragment {
         if (layoutPredictions != null) layoutPredictions.setVisibility(View.GONE);
         if (layoutGeminiLoading != null) layoutGeminiLoading.setVisibility(View.GONE);
         checkAndLaunchCamera();
-    }
-
-    private void showApiKeyInputDialog(@Nullable Runnable onKeySaved) {
-        if (getContext() == null) return;
-
-        final EditText input = new EditText(getContext());
-        input.setSingleLine(true);
-        input.setHint("AIzaSy...");
-        String existingKey = GeminiVisionAgent.getApiKey(getContext());
-        if (existingKey != null && !existingKey.isEmpty()) {
-            input.setText(existingKey);
-            input.setSelection(existingKey.length());
-        }
-
-        FrameLayout container = new FrameLayout(getContext());
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        int marginPx = (int) (20 * getResources().getDisplayMetrics().density);
-        params.leftMargin = marginPx;
-        params.rightMargin = marginPx;
-        params.topMargin = marginPx / 2;
-        params.bottomMargin = marginPx / 2;
-        input.setLayoutParams(params);
-        container.addView(input);
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Google Gemini Vision API Key")
-                .setMessage("Note: On-Device AI scans meals (Idli, Dal Rice, Dosa, Roti, Biryani, Pizza, Burger, etc.) 100% offline without needing any API key.\n\nTo optionally use Google's multimodal Gemini Vision for complex custom dishes, paste your API key (starts with AIzaSy...).\n\nTap 'Get Free Key' to generate a free key from Google AI Studio.")
-                .setView(container)
-                .setPositiveButton("Save & Use", (dialog, which) -> {
-                    String entered = input.getText().toString().trim();
-                    if (!entered.isEmpty()) {
-                        GeminiVisionAgent.setApiKey(getContext(), entered);
-                        Toast.makeText(getContext(), "Gemini API Key saved!", Toast.LENGTH_SHORT).show();
-                        if (onKeySaved != null) {
-                            onKeySaved.run();
-                        }
-                    } else {
-                        Toast.makeText(getContext(), "API Key cannot be empty. Paste your AIzaSy... key or use On-Device AI.", Toast.LENGTH_LONG).show();
-                    }
-                })
-                .setNegativeButton("Cancel", null);
-
-        if (existingKey != null && !existingKey.isEmpty()) {
-            builder.setNeutralButton("Clear Key", (dialog, which) -> {
-                GeminiVisionAgent.clearApiKey(getContext());
-                Toast.makeText(getContext(), "Gemini API Key removed.", Toast.LENGTH_SHORT).show();
-            });
-        } else {
-            builder.setNeutralButton("Get Free Key", (dialog, which) -> {
-                try {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://aistudio.google.com/"));
-                    startActivity(browserIntent);
-                } catch (Exception e) {
-                    Toast.makeText(getContext(), "Please open aistudio.google.com in your browser.", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-        builder.show();
     }
 
     private String joinStrings(List<String> list, String delimiter) {

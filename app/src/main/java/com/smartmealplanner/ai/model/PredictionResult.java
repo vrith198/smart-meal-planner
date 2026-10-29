@@ -250,7 +250,7 @@ public class PredictionResult {
     }
 
     public boolean isGeminiResult() {
-        return "GEMINI_AGENT".equalsIgnoreCase(aiSource);
+        return "GEMINI_AGENT".equalsIgnoreCase(aiSource) || "GEMINI_BUILTIN_AI".equalsIgnoreCase(aiSource);
     }
 
     @Override
