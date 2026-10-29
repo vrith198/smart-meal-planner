@@ -357,9 +357,22 @@ public class FoodClassifier {
 
         // 3. Autonomous Structural Inspection:
 
-        // A. Steamed Idli (Pure white/pale neutral spongy circular cakes)
-        boolean isIdli = (avgBrightness > 0.40f && colorSpread < 0.18f && greenness < 0.12f && yellowness < 0.06f);
-        if (isIdli) {
+        // A. Caesar / Leafy Salad (Genuinely green leafy content with dressing)
+        boolean isSalad = (greenness > 0.10f || (gMean > bMean * 1.25f && greenness > 0.06f));
+        if (isSalad) {
+            as_ *= (40.0f + greenness * 40.0f);
+            aDalRice *= 0.001f;
+            aDal *= 0.001f;
+            aBurger *= 0.001f;
+            ap *= 0.001f;
+            af *= 0.001f;
+            aIdli *= 0.001f;
+            aRice *= 0.001f;
+        }
+
+        // B. Steamed Idli (Pure white/pale neutral spongy circular cakes)
+        boolean isIdli = (avgBrightness > 0.40f && colorSpread < 0.15f && greenness < 0.05f && yellowness < 0.04f);
+        if (isIdli && !isSalad) {
             aIdli *= 50.0f;
             aRice *= 10.0f;
             aDalRice *= 0.001f;
@@ -370,75 +383,71 @@ public class FoodClassifier {
             af *= 0.001f;
         }
 
-        // B. Yellow Dal / Dal Rice (Turmeric yellow lentil gravy or Dal served over white rice)
-        boolean hasYellowDal = (yellowness > 0.07f || (rMean > 0.36f && gMean > 0.26f && rMean > bMean + 0.05f)) && greenness < 0.14f && !isIdli;
-        if (hasYellowDal) {
-            if (avgBrightness > 0.40f) {
+        // C. Stacked Burger / Sandwich
+        if (hasTopBun && hasMidFillings && hasPattyBelow && greenness < 0.20f && !isSalad && !isIdli) {
+            aBurger *= 45.0f;
+            as_ *= 0.001f;
+            aDalRice *= 0.001f;
+            aDal *= 0.001f;
+        }
+
+        // D. Pizza (Flat circular crust with red sauce & melted cheese)
+        if ((redness > 0.25f || (rMean > gMean * 1.15f && rMean > bMean * 1.20f)) && avgBrightness > 0.38f && yellowness < 0.18f && !isSalad && !isIdli && !hasTopBun) {
+            ap *= 45.0f;
+            as_ *= 0.001f;
+            aDalRice *= 0.001f;
+            aDal *= 0.001f;
+        }
+
+        // E. French Fries (Golden yellow strips, high r/b and g/b, low blue < 0.22)
+        if (yellowness > 0.12f && rMean > bMean * 1.8f && bMean < 0.22f && greenness < 0.04f && !isSalad && !isIdli && !hasTopBun) {
+            af *= 45.0f;
+            aSamosa *= 4.0f;
+            as_ *= 0.001f;
+            aDalRice *= 0.001f;
+        }
+
+        // F. Yellow Dal / Dal Rice (Turmeric yellow lentil gravy or Dal served over white rice)
+        if (yellowness > 0.14f && greenness < 0.06f && !isSalad && !isIdli && !hasTopBun) {
+            if (avgBrightness > 0.38f) {
                 // Combination of yellow dal gravy + white rice grains
-                aDalRice *= 60.0f;
-                aDal *= 25.0f;
+                aDalRice *= 50.0f;
+                aDal *= 20.0f;
                 aRice *= 15.0f;
             } else {
                 // Dal gravy bowl
-                aDal *= 50.0f;
-                aDalRice *= 25.0f;
+                aDal *= 45.0f;
+                aDalRice *= 20.0f;
             }
-            aIdli *= 0.001f;
             as_ *= 0.001f;
             aBurger *= 0.001f;
             ap *= 0.001f;
             af *= 0.001f;
         }
 
-        // C. Stacked Burger / Sandwich
-        if (hasTopBun && hasMidFillings && hasPattyBelow && greenness < 0.35f && !isIdli && !hasYellowDal) {
-            aBurger *= 35.0f;
-            as_ *= 0.001f;
+        // G. Fragrant Biryani (Spiced yellow/orange rice with visible grains)
+        if (rMean > 0.50f && gMean > 0.38f && yellowness > 0.15f && redness > 0.15f && greenness < 0.05f && !isSalad && !isIdli && !hasTopBun) {
+            aBiryani *= 40.0f;
         }
 
-        // D. Pizza (Flat circular crust with red sauce & melted cheese)
-        if ((redness > 0.22f || rMean > gMean + 0.10f) && yellowness > 0.08f && !hasTopBun && !isIdli && !hasYellowDal) {
-            ap *= 35.0f;
-            as_ *= 0.001f;
+        // H. Crispy Potato Samosa (Golden triangular pastry)
+        if (yellowness > 0.14f && redness > 0.25f && greenness < 0.04f && !isSalad && !isIdli && !hasTopBun) {
+            aSamosa *= 35.0f;
         }
 
-        // E. Caesar / Leafy Salad (ONLY when genuinely high green leafy content exists)
-        if ((greenness > 0.18f || (gMean > rMean * 1.08f && gMean > bMean * 1.08f)) && !hasTopBun && !isIdli && !hasYellowDal) {
-            as_ *= 30.0f;
-            aBurger *= 0.01f;
-        } else {
-            as_ *= 0.01f; // Suppress salad false-positive for non-green meals
+        // I. Crispy Plain Dosa (Golden brown large crepe)
+        if (rMean > 0.48f && gMean > 0.36f && yellowness > 0.10f && greenness < 0.04f && !isSalad && !isIdli && !hasTopBun) {
+            aDosa *= 35.0f;
         }
 
-        // F. French Fries (Golden yellow strips)
-        if (yellowness > 0.18f && redness > 0.30f && bMean < 0.28f && greenness < 0.03f && !hasTopBun && !isIdli) {
-            af *= 25.0f;
-            aSamosa *= 4.0f;
-        }
-
-        // G. Crispy Dosa (Golden brown large crepe)
-        if (rMean > 0.48f && gMean > 0.36f && yellowness > 0.15f && !hasTopBun && !isIdli && !hasYellowDal) {
-            aDosa *= 25.0f;
-        }
-
-        // H. Fragrant Biryani (Spiced yellow/orange rice with visible grains)
-        if (rMean > 0.50f && gMean > 0.38f && yellowness > 0.20f && redness > 0.15f && !hasTopBun && !isIdli) {
-            aBiryani *= 25.0f;
-        }
-
-        // I. Whole Wheat Roti (Flat round tan/brown flatbread)
-        if (rMean > 0.45f && gMean > 0.36f && greenness < 0.03f && !hasTopBun && !isIdli && !hasYellowDal) {
-            aRoti *= 20.0f;
-        }
-
-        // J. Crispy Potato Samosa (Golden triangular pastry)
-        if (yellowness > 0.15f && redness > 0.30f && greenness < 0.03f && !hasTopBun && !isIdli && !hasYellowDal) {
-            aSamosa *= 20.0f;
+        // J. Whole Wheat Roti (Flat round tan/brown flatbread)
+        if (rMean > 0.45f && gMean > 0.35f && greenness < 0.04f && !isSalad && !isIdli && !hasTopBun) {
+            aRoti *= 30.0f;
         }
 
         // K. Steamed Basmati Rice
-        if (avgBrightness > 0.55f && colorSpread < 0.18f && !hasYellowDal && !isIdli) {
-            aRice *= 20.0f;
+        if (avgBrightness > 0.55f && colorSpread < 0.16f && yellowness < 0.06f && greenness < 0.04f && !isSalad && !isIdli) {
+            aRice *= 25.0f;
         }
 
         float total = ap + as_ + af + aBurger + aSamosa + aDal + aDalRice + aRoti + aRice + aIdli + aDosa + aBiryani;
@@ -592,9 +601,9 @@ public class FoodClassifier {
             float b = (p & 0xFF) / 255.0f;
 
             sumR += r; sumG += g; sumB += b;
-            if (g > r * 1.05f && g > b) greenCount++;
-            if (r > g * 1.15f && r > b * 1.15f) redCount++;
-            if (r > 0.40f && g > 0.25f && b < 0.35f) yellowCount++;
+            if (g > r * 0.90f && g > b * 1.10f && g > 0.25f) greenCount++;
+            if (r > g * 1.20f && r > b * 1.20f) redCount++;
+            if (r > 0.40f && g > 0.30f && b < 0.25f) yellowCount++;
         }
 
         float rMean = sumR / 256.0f;
