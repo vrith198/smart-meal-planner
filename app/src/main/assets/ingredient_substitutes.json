@@ -2,7 +2,13 @@
   {
     "canonicalName": "Fresh Paneer",
     "category": "Dairy / Protein",
-    "aliases": ["paneer", "fresh paneer", "cottage cheese", "indian cottage cheese", "chenna"],
+    "aliases": [
+      "paneer",
+      "fresh paneer",
+      "cottage cheese",
+      "indian cottage cheese",
+      "chenna"
+    ],
     "substitutes": [
       {
         "name": "Firm Tofu (Press-Drained)",
@@ -10,8 +16,8 @@
         "dietaryTag": "VEGAN, DAIRY-FREE",
         "culinaryRole": "Cubed curry & tikka protein substitute",
         "reason": "Maintains structural integrity without crumbling when simmered in gravies or grilled. Readily absorbs marinades and spices with a similar chew and protein density.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/tofu-guide-varieties-and-how-to-use-them"
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/soy/"
       },
       {
         "name": "Halloumi Cheese",
@@ -19,8 +25,8 @@
         "dietaryTag": "VEGETARIAN, HIGH-PROTEIN",
         "culinaryRole": "Grilling & tikka substitute",
         "reason": "Exhibits a high melting point identical to paneer, allowing it to develop a golden crust in tikkas and stir-fries without melting or collapsing.",
-        "sourceName": "The Spruce Eats",
-        "sourceUrl": "https://www.thespruceeats.com/what-is-halloumi-cheese-2356073"
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Halloumi"
       },
       {
         "name": "Pressed Ricotta Salata",
@@ -28,15 +34,21 @@
         "dietaryTag": "VEGETARIAN",
         "culinaryRole": "Mild milk curd curry substitute",
         "reason": "Firm, salted fresh cheese curd providing a comparable neutral milkiness and non-melting texture in vegetable and spinach curries.",
-        "sourceName": "USDA FoodData Central",
-        "sourceUrl": "https://fdc.nal.usda.gov/"
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Ricotta#Ricotta_salata"
       }
     ]
   },
   {
     "canonicalName": "Whole Wheat Atta",
     "category": "Grains & Flour",
-    "aliases": ["whole wheat atta", "atta", "wheat flour", "chapati flour", "whole wheat flour"],
+    "aliases": [
+      "whole wheat atta",
+      "atta",
+      "wheat flour",
+      "chapati flour",
+      "whole wheat flour"
+    ],
     "substitutes": [
       {
         "name": "Jowar (Sorghum) Flour + Warm Water",
@@ -44,8 +56,8 @@
         "dietaryTag": "GLUTEN-FREE, FIBER-RICH",
         "culinaryRole": "Flatbread & roti dough",
         "reason": "Traditional ancient grain flour that kneads into pliable gluten-free flatbreads (bhakri/roti) with excellent fiber and slow-release carbohydrates.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/sorghum-flour-nutrition"
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Commercial_sorghum"
       },
       {
         "name": "50% All-Purpose Flour + 50% Fine Oat Flour",
@@ -53,8 +65,8 @@
         "dietaryTag": "VEGETARIAN",
         "culinaryRole": "Pliable everyday rotis and wraps",
         "reason": "Combining oat flour with refined wheat flour replicates whole grain atta's bran elasticity and moisture retention while maintaining easy rollability.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/gluten-free-flour-substitutes"
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/what-should-you-eat/whole-grains/"
       },
       {
         "name": "Besan (Gram Flour) Blend",
@@ -62,15 +74,21 @@
         "dietaryTag": "HIGH-PROTEIN",
         "culinaryRole": "Nutrient-dense missi roti",
         "reason": "Chickpea flour enriches flatbreads with nutty flavor and higher vegetable protein, widely used across Northern Indian cooking.",
-        "sourceName": "BBC Good Food",
-        "sourceUrl": "https://www.bbcgoodfood.com/glossary/gram-flour-glossary"
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Gram_flour"
       }
     ]
   },
   {
     "canonicalName": "Toor Dal (Lentils)",
     "category": "Legumes & Pulses",
-    "aliases": ["toor dal", "toor dal (lentils)", "pigeon peas", "yellow lentils", "arhar dal"],
+    "aliases": [
+      "toor dal",
+      "toor dal (lentils)",
+      "pigeon peas",
+      "yellow lentils",
+      "arhar dal"
+    ],
     "substitutes": [
       {
         "name": "Yellow Split Peas",
@@ -78,8 +96,8 @@
         "dietaryTag": "VEGAN, GLUTEN-FREE",
         "culinaryRole": "Tadka dal & sambar base",
         "reason": "Yellow split peas have nearly identical starch content, color, and breakdown viscosity to toor dal, producing a rich and thick tadka broth.",
-        "sourceName": "The Spruce Eats",
-        "sourceUrl": "https://www.thespruceeats.com/yellow-split-peas-substitutes-4155701"
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Split_pea"
       },
       {
         "name": "Moong Dal (Yellow Petite Lentils)",
@@ -87,8 +105,8 @@
         "dietaryTag": "VEGAN, EASY DIGESTION",
         "culinaryRole": "Quick comforting lentil soup",
         "reason": "Cooks much faster than toor dal and produces a silky, light comfort soup ideal for everyday lentils without requiring pressure cooking.",
-        "sourceName": "USDA FoodData Central",
-        "sourceUrl": "https://fdc.nal.usda.gov/"
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Mung_bean"
       },
       {
         "name": "Masoor Dal (Split Red Lentils)",
@@ -96,15 +114,22 @@
         "dietaryTag": "VEGAN, HIGH-PROTEIN",
         "culinaryRole": "Velvety spiced dal",
         "reason": "Softens easily into a creamy puree that carries cumin, mustard, and garlic tadka aromatics exceptionally well.",
-        "sourceName": "BBC Good Food",
-        "sourceUrl": "https://www.bbcgoodfood.com/howto/guide/all-about-lentils"
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/legumes-pulses/"
       }
     ]
   },
   {
     "canonicalName": "Ghee / Cooking Oil",
     "category": "Fats & Oils",
-    "aliases": ["ghee / oil", "ghee / cooking oil", "ghee", "clarified butter", "cooking oil", "frying oil"],
+    "aliases": [
+      "ghee / oil",
+      "ghee / cooking oil",
+      "ghee",
+      "clarified butter",
+      "cooking oil",
+      "frying oil"
+    ],
     "substitutes": [
       {
         "name": "Extra Virgin Olive Oil / Avocado Oil",
@@ -112,8 +137,8 @@
         "dietaryTag": "HEART-HEALTHY, VEGAN",
         "culinaryRole": "Tempering & sauteing",
         "reason": "High in monounsaturated fats and oleic acid, providing clean smoke resistance for tadkas and everyday vegetable sauteing.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/ghee-substitutes"
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/what-should-you-eat/fats-and-cholesterol/"
       },
       {
         "name": "Refined Virgin Coconut Oil",
@@ -121,8 +146,8 @@
         "dietaryTag": "VEGAN, DAIRY-FREE",
         "culinaryRole": "High-heat frying & South Indian tadkas",
         "reason": "Mimics the rich mouthfeel and saturated fat stability of clarified butter, blending naturally with mustard seeds and curry leaves.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/cooking-fats-101-whats-the-best-oil-for-frying"
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Coconut_oil"
       },
       {
         "name": "Unsalted Butter (Browned)",
@@ -130,15 +155,21 @@
         "dietaryTag": "VEGETARIAN",
         "culinaryRole": "Rich aromatic finishing fat",
         "reason": "Browning unsalted butter toasts the milk solids, creating the signature nutty aroma and golden finish of traditional desi ghee.",
-        "sourceName": "The Spruce Eats",
-        "sourceUrl": "https://www.thespruceeats.com/substitute-for-ghee-4155699"
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Beurre_noisette"
       }
     ]
   },
   {
     "canonicalName": "Fresh Tomatoes",
     "category": "Produce",
-    "aliases": ["tomatoes", "tomato", "fresh tomatoes", "chopped tomatoes", "tomato puree"],
+    "aliases": [
+      "tomatoes",
+      "tomato",
+      "fresh tomatoes",
+      "chopped tomatoes",
+      "tomato puree"
+    ],
     "substitutes": [
       {
         "name": "Canned Crushed Tomatoes / Passata",
@@ -146,400 +177,472 @@
         "dietaryTag": "VEGAN, PANTRY-STAPLE",
         "culinaryRole": "Curry base & pasta sauce",
         "reason": "Canned Italian plum tomatoes are vine-ripened, offering consistent acidity and rich umami that reduces smoothly into gravies.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/canned-tomatoes-guide"
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Tomato_pur%C3%A9e"
       },
       {
         "name": "Tamarind Paste + Dollop of Yogurt",
-        "ratio": "1 tsp tamarind + 2 tbsp yogurt per tomato",
-        "dietaryTag": "VEGETARIAN",
-        "culinaryRole": "Tangy curry body & acidity",
-        "reason": "Provides the balancing tartness and saucy body required in Indian gravies and dal when tomatoes are scarce.",
+        "ratio": "1 tsp paste per tomato",
+        "dietaryTag": "VEGETARIAN, TANGY DEPTH",
+        "culinaryRole": "Sour base for rasam & sambar",
+        "reason": "Provides concentrated tartaric acidity and fruity tang that replicates the natural sour notes of native desi country tomatoes.",
         "sourceName": "BBC Good Food",
         "sourceUrl": "https://www.bbcgoodfood.com/glossary/tamarind-glossary"
       },
       {
         "name": "Red Bell Pepper Puree + Lemon Juice",
-        "ratio": "1:1 by weight with 1 tsp lemon juice",
-        "dietaryTag": "NIGHTSHADE-FRIENDLY ALTERNATIVE",
-        "culinaryRole": "Sweet acid base for curries",
-        "reason": "Roasted red pepper puree provides vibrant red color, sweetness, and thickness, balanced by lemon juice for clean acidity.",
-        "sourceName": "The Spruce Eats",
-        "sourceUrl": "https://www.thespruceeats.com/tomato-substitutes-4155705"
+        "ratio": "1:1 ratio by volume",
+        "dietaryTag": "NIGHTSHADE-FRIENDLY, LOW-ACID",
+        "culinaryRole": "Mild sweet-tart curry body",
+        "reason": "Roasted red capsicum gives deep red color, velvety body, and sweet aroma, balanced with a squeeze of fresh lemon for brightness.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Bell_pepper"
       }
     ]
   },
   {
     "canonicalName": "Onions",
     "category": "Aromatics",
-    "aliases": ["onions", "onion", "potatoes & onions", "finely chopped onion & chili"],
+    "aliases": [
+      "onions",
+      "onion",
+      "chopped onions",
+      "sliced onions",
+      "red onion",
+      "yellow onion"
+    ],
     "substitutes": [
       {
         "name": "Shallots or Leeks",
-        "ratio": "1:1 by weight",
-        "dietaryTag": "VEGAN, AROMATIC",
-        "culinaryRole": "Delicate aromatic base",
-        "reason": "Shallots caramelize rapidly with a sweet allium depth, while leeks lend a mild, tender body to sauteed bases.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/shallot-substitutes"
+        "ratio": "1:1 ratio by weight",
+        "dietaryTag": "VEGAN, SWEET AROMATIC",
+        "culinaryRole": "Gravy base & tadka aromatic",
+        "reason": "Shallots caramelize faster with a delicate, sweet allium flavor that integrates seamlessly into Indian masalas and Western sauces.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Shallot"
       },
       {
         "name": "Hing (Asafoetida) in Oil",
-        "ratio": "1/4 tsp hing per chopped onion",
-        "dietaryTag": "JAIN, ALLIUM-FREE, LOW-FODMAP",
-        "culinaryRole": "Sautéed aromatic substitute",
-        "reason": "When bloomed in hot oil or ghee, asafoetida releases volatile sulfur compounds that mirror the savoriness of fried onions and garlic.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/asafoetida-benefits"
+        "ratio": "1/4 tsp per onion",
+        "dietaryTag": "JAIN-FRIENDLY, LOW-FODMAP",
+        "culinaryRole": "Sattvic onion-garlic aroma substitute",
+        "reason": "When bloomed in hot ghee or oil, asafoetida releases sulfurous volatile aromatics that emulate the pungent depth of cooked onions.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Asafoetida"
       },
       {
         "name": "Grated Cabbage + Ginger",
-        "ratio": "1:1 by volume for curry bases",
-        "dietaryTag": "LOW-CARB, FIBER",
-        "culinaryRole": "Curry volume and natural sweetness",
-        "reason": "Caramelizes similarly to onions when browned in oil, building thick curry body without sharp pungency.",
-        "sourceName": "USDA FoodData Central",
-        "sourceUrl": "https://fdc.nal.usda.gov/"
+        "ratio": "1:1 ratio by volume",
+        "dietaryTag": "LOW-CARB, BULK PRODUCING",
+        "culinaryRole": "Thickening & sweet body in gravies",
+        "reason": "Finely minced cabbage browns naturally like onions and contributes wholesome vegetable sweetness and moisture to thick sauces.",
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/what-should-you-eat/vegetables-and-fruits/"
       }
     ]
   },
   {
     "canonicalName": "Pasteurized Milk Curd",
     "category": "Dairy",
-    "aliases": ["pasteurized milk curd", "curd", "yogurt", "dahi", "plain yogurt", "yogurt & spices"],
+    "aliases": [
+      "curd",
+      "dahi",
+      "plain yogurt",
+      "yogurt",
+      "buttermilk",
+      "pasteurized milk curd"
+    ],
     "substitutes": [
       {
         "name": "Plain Greek Yogurt (Whisked with Water)",
-        "ratio": "3/4 cup Greek yogurt + 1/4 cup water",
-        "dietaryTag": "HIGH-PROTEIN, VEGETARIAN",
-        "culinaryRole": "Marinades, raita & gravies",
-        "reason": "Higher in protein and thick, whisked Greek yogurt delivers authentic lactic tang and creamy emulsification in marinades.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/greek-yogurt-benefits"
+        "ratio": "75% yogurt + 25% water",
+        "dietaryTag": "HIGH-PROTEIN, THICK CURD",
+        "culinaryRole": "Raita, kadhi & marinade base",
+        "reason": "Strained yogurt provides identical active probiotic cultures, rich lactic tartness, and heat resistance that prevents curdling in marinades.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Strained_yogurt"
       },
       {
         "name": "Unsweetened Coconut Yogurt",
-        "ratio": "1:1 by volume",
+        "ratio": "1:1 ratio by weight",
         "dietaryTag": "VEGAN, DAIRY-FREE",
-        "culinaryRole": "Cooling dips & non-dairy curries",
-        "reason": "Rich plant-based medium that carries live active cultures with creamy texture, pairing naturally with Indian and Thai spices.",
-        "sourceName": "The Spruce Eats",
-        "sourceUrl": "https://www.thespruceeats.com/dairy-free-yogurt-substitutes-4155708"
+        "culinaryRole": "Creamy South Indian pachadi & raita",
+        "reason": "Naturally creamy plant yogurt offering gentle acidity and coconut fragrance that harmonizes with curry leaves and mustard seeds.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Plant_milk"
       },
       {
         "name": "Silken Tofu Blended with Lemon",
-        "ratio": "1 cup silken tofu + 1 tbsp lemon juice",
-        "dietaryTag": "VEGAN, LOW-FAT",
-        "culinaryRole": "Thick curry sauces and tandoori paste",
-        "reason": "Blends completely smooth without curdling under heat, holding spices and acidity firmly in place.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/silken-tofu-recipes-and-guide"
+        "ratio": "100g tofu + 1 tsp lemon",
+        "dietaryTag": "VEGAN, HIGH-PROTEIN",
+        "culinaryRole": "Stable cooking sauce base",
+        "reason": "Smooth blended silken tofu delivers neutral creaminess and body for curries without splitting under high heat.",
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/soy/"
       }
     ]
   },
   {
     "canonicalName": "Chickpeas (Kabuli Chana)",
     "category": "Legumes & Pulses",
-    "aliases": ["chickpeas (kabuli chana)", "chickpeas", "chana", "kabuli chana", "garbanzo beans"],
+    "aliases": [
+      "chickpeas",
+      "kabuli chana",
+      "garbanzo beans",
+      "white chickpeas",
+      "chana"
+    ],
     "substitutes": [
       {
         "name": "Cannellini (White Kidney) Beans",
-        "ratio": "1:1 by weight",
-        "dietaryTag": "VEGAN, GLUTEN-FREE",
-        "culinaryRole": "Creamy stew & chole substitute",
-        "reason": "Possesses a tender skin, creamy interior, and substantial size that soaks up rich spiced gravies just like white chickpeas.",
-        "sourceName": "Allrecipes",
-        "sourceUrl": "https://www.allrecipes.com/article/substitutes-for-chickpeas/"
+        "ratio": "1:1 ratio cooked weight",
+        "dietaryTag": "VEGAN, FIBER-RICH",
+        "culinaryRole": "Creamy gravy curries & salads",
+        "reason": "Large, creamy white beans with a tender skin that easily absorb Punjabi chole spices or Mediterranean dressings.",
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/legumes-pulses/"
       },
       {
         "name": "Kala Chana (Brown Desi Chickpeas)",
-        "ratio": "1:1 by weight",
-        "dietaryTag": "HIGH-FIBER, LOW-GI",
-        "culinaryRole": "Nutty spiced dry curries",
-        "reason": "Smaller and firmer with an earthy, rustic bite and higher dietary fiber content, excellent for traditional curried legumes.",
-        "sourceName": "USDA FoodData Central",
-        "sourceUrl": "https://fdc.nal.usda.gov/"
+        "ratio": "1:1 ratio by dry weight",
+        "dietaryTag": "HIGH-IRON, ANCIENT LEGUME",
+        "culinaryRole": "Earthy, firm curry & dry masala",
+        "reason": "Traditional heirloom brown chickpeas offering a nutty, firm chew and higher iron content that holds up under long cooking.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chickpea"
       },
       {
         "name": "Firm Edamame / Green Peas",
-        "ratio": "1:1 by volume",
-        "dietaryTag": "VEGAN, QUICK-COOKING",
-        "culinaryRole": "Salad & stir-fry plant protein",
-        "reason": "Requires no soaking or long simmering, providing bright green color, fresh sweetness, and complete amino acid profile.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/edamame-benefits"
+        "ratio": "1:1 ratio cooked weight",
+        "dietaryTag": "LOW-CARB, HIGH-PROTEIN",
+        "culinaryRole": "Fresh green protein addition",
+        "reason": "Young soybeans provide complete amino acid profiles with a sweet, firm pop in quick stir-fries, grain bowls, and curries.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Edamame"
       }
     ]
   },
   {
     "canonicalName": "Whole Eggs",
-    "category": "Protein / Baking",
-    "aliases": ["whole eggs", "eggs", "egg", "boiled egg", "egg whites"],
+    "category": "Poultry / Protein",
+    "aliases": [
+      "egg",
+      "eggs",
+      "whole eggs",
+      "egg white",
+      "egg yolk",
+      "boiled egg"
+    ],
     "substitutes": [
       {
         "name": "Ground Flaxseed Meal + Water (Flax Egg)",
-        "ratio": "1 egg = 1 tbsp flaxseed meal + 3 tbsp warm water",
+        "ratio": "1 tbsp ground flax + 3 tbsp water = 1 egg",
         "dietaryTag": "VEGAN, OMEGA-3 RICH",
-        "culinaryRole": "Baking & patty binder",
-        "reason": "Forms a viscous soluble fiber mucilage that binds burger patties, pancakes, and quick breads identically to whole eggs.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/egg-substitutes"
+        "culinaryRole": "Baking & binding in fritters/patties",
+        "reason": "Soluble mucilage fiber in ground flax creates a gelatinous emulsion that binds baked goods and veg cutlets identically to egg whites.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Flax"
       },
       {
         "name": "Aquafaba (Chickpea Cooking Liquid)",
-        "ratio": "1 egg = 3 tbsp aquafaba (or 2 tbsp for white)",
-        "dietaryTag": "VEGAN, ALLERGEN-FREE",
-        "culinaryRole": "Foaming, leavening & light batters",
-        "reason": "Saponins and starches in aquafaba mimic albumin protein chains, whipping into stable peaks for meringues, waffles, and batter binds.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/aquafaba-guide-vegan-egg-substitute"
+        "ratio": "3 tbsp liquid = 1 whole egg",
+        "dietaryTag": "VEGAN, LIGHT EMULSION",
+        "culinaryRole": "Foaming, leavening & sauces",
+        "reason": "Plant proteins and starches in cooked chickpea brine whip into stiff peaks for vegan mayonnaise, meringues, and light pancakes.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Aquafaba"
       },
       {
         "name": "Silken Tofu Puree",
-        "ratio": "1 egg = 1/4 cup pureed silken tofu",
-        "dietaryTag": "VEGAN, HIGH-PROTEIN",
-        "culinaryRole": "Moist dense cakes, scrambles & quiches",
-        "reason": "Supplies dense moisture and neutral protein structure without introducing unwanted fruit flavors to savory dishes.",
-        "sourceName": "The Spruce Eats",
-        "sourceUrl": "https://www.thespruceeats.com/substitutes-for-eggs-in-cooking-4155709"
+        "ratio": "1/4 cup pureed tofu = 1 egg",
+        "dietaryTag": "VEGAN, MOIST BINDING",
+        "culinaryRole": "Dense cakes, scrambles & quiches",
+        "reason": "Moist, neutral soy curd that lends tender crumb structure to quick breads and mimics scrambled eggs with a pinch of black salt (kala namak).",
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/soy/"
       }
     ]
   },
   {
     "canonicalName": "Basmati Rice",
-    "category": "Grains",
-    "aliases": ["basmati rice", "steamed basmati rice", "white rice", "rice", "sushi rice & nori"],
+    "category": "Grains & Cereals",
+    "aliases": [
+      "rice",
+      "basmati rice",
+      "white rice",
+      "steamed rice",
+      "cooked rice",
+      "raw rice"
+    ],
     "substitutes": [
       {
         "name": "Cauliflower Rice (Freshly Riced & Sauteed)",
-        "ratio": "1:1 by volume",
-        "dietaryTag": "KETO, LOW-CARB, DIABETIC-FRIENDLY",
-        "culinaryRole": "Grain-free curry & stir-fry accompaniment",
-        "reason": "Drops net carbs by 90% while providing an uncanny appearance and neutral vehicle for rich dal, curries, and gravies.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/cauliflower-rice-substitutes"
+        "ratio": "1:1 ratio by volume",
+        "dietaryTag": "KETO, ULTRA-LOW-CALORIE",
+        "culinaryRole": "Low-carb curry side & fried rice",
+        "reason": "Provides a fluffy, non-sticky bed for curries and dals with less than 25 calories per cup, cutting carbohydrates by 90%.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cauliflower"
       },
       {
         "name": "Quinoa (Steamed Fluffy)",
-        "ratio": "1:1 cooked volume",
-        "dietaryTag": "GLUTEN-FREE, COMPLETE-PROTEIN",
-        "culinaryRole": "Nutrient-dense grain base",
-        "reason": "Delivers all 9 essential amino acids with a nutty crunch and light, separable grain texture that holds curry sauce cleanly.",
-        "sourceName": "USDA FoodData Central",
-        "sourceUrl": "https://fdc.nal.usda.gov/"
+        "ratio": "1:1 ratio cooked volume",
+        "dietaryTag": "COMPLETE-PROTEIN, GLUTEN-FREE",
+        "culinaryRole": "Nutrient-packed grain replacement",
+        "reason": "Ancient Andean pseudocereal containing all 9 essential amino acids with a nutty texture that pairs naturally with spicy Indian lentils.",
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/food-features/quinoa/"
       },
       {
         "name": "Brown Basmati / Jasmine Rice",
-        "ratio": "1:1 by volume",
-        "dietaryTag": "WHOLE-GRAIN, HIGH-FIBER",
-        "culinaryRole": "Slow-release daily staple",
-        "reason": "Preserves the bran layer for slower glycemic response and sustained fullness while keeping the floral basmati aroma.",
-        "sourceName": "BBC Good Food",
-        "sourceUrl": "https://www.bbcgoodfood.com/howto/guide/best-rice-varieties"
+        "ratio": "1:1 ratio cooked volume",
+        "dietaryTag": "WHOLE-GRAIN, LOW-GI",
+        "culinaryRole": "Slow-release daily energy staple",
+        "reason": "Retains the intact bran and germ layers, offering sustained energy release and 3x the dietary fiber of polished white rice.",
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/what-should-you-eat/whole-grains/"
       }
     ]
   },
   {
     "canonicalName": "Mozzarella Cheese",
     "category": "Dairy",
-    "aliases": ["mozzarella cheese", "mozzarella", "cheese", "parmesan & croutons"],
+    "aliases": [
+      "mozzarella",
+      "cheese",
+      "mozzarella cheese",
+      "pizza cheese",
+      "grated cheese",
+      "cheddar"
+    ],
     "substitutes": [
       {
         "name": "Vegan Cashew Mozzarella",
-        "ratio": "1:1 by weight",
+        "ratio": "1:1 ratio by weight",
         "dietaryTag": "VEGAN, DAIRY-FREE",
         "culinaryRole": "Melting pizza & pasta topping",
-        "reason": "Cultured cashew paste blended with tapioca starch achieves authentic bubbling stretch and mild milky taste under broiler heat.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/vegan-cheese-guide"
+        "reason": "Cultured cashew paste blended with tapioca starch delivers an authentic stretch and glossy melt when baked at high heat.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Vegan_cheese"
       },
       {
         "name": "Provolone / Young Gouda",
-        "ratio": "1:1 by weight",
-        "dietaryTag": "VEGETARIAN",
-        "culinaryRole": "Rich bubbling cheese stretch",
-        "reason": "Exhibits similar elasticity and moisture content, browning with delicious savoriness across baked flatbreads and pizzas.",
-        "sourceName": "The Spruce Eats",
-        "sourceUrl": "https://www.thespruceeats.com/substitutes-for-mozzarella-cheese-4155711"
+        "ratio": "1:1 ratio by weight",
+        "dietaryTag": "VEGETARIAN, RICH MELT",
+        "culinaryRole": "Stringy, golden bubbling crust",
+        "reason": "Italian stretched-curd cheese sharing mozzarella's pliable melt dynamics while offering a slightly deeper savory character.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Provolone"
       },
       {
         "name": "Nutritional Yeast + Tahini Drizzle",
-        "ratio": "2 tbsp nutritional yeast + 1 tbsp tahini",
-        "dietaryTag": "VEGAN, VITAMIN-B12 RICH",
-        "culinaryRole": "Cheesy umami seasoning",
-        "reason": "Provides intense cheesy flavor, savory glutamates, and creamy mouthfeel for topping salads, roasted vegetables, and pasta.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/nutritional-yeast-benefits"
+        "ratio": "2 tbsp yeast + 1 tsp tahini",
+        "dietaryTag": "VEGAN, B-VITAMIN RICH",
+        "culinaryRole": "Savory umami dusting",
+        "reason": "Deactivated nutritional yeast delivers rich cheesy umami with zero dairy, cholesterol, or saturated fat.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Nutritional_yeast"
       }
     ]
   },
   {
     "canonicalName": "Chicken Breast / Thighs",
-    "category": "Poultry & Meat",
-    "aliases": ["chicken breast / thighs", "chicken", "chicken curry", "poultry", "grilled patty"],
+    "category": "Poultry / Meat",
+    "aliases": [
+      "chicken",
+      "chicken breast",
+      "chicken thighs",
+      "boneless chicken",
+      "cooked chicken",
+      "grilled chicken"
+    ],
     "substitutes": [
       {
         "name": "Pressed Firm Tofu or Soy Chunks (Soya Vadi)",
-        "ratio": "1:1 by weight",
+        "ratio": "1:1 ratio rehydrated weight",
         "dietaryTag": "VEGAN, HIGH-PROTEIN",
-        "culinaryRole": "Curry & tikka meat alternative",
-        "reason": "Soy protein fibers naturally soak up aromatic stocks and marinades, giving a juicy chew comparable to diced chicken breast.",
-        "sourceName": "USDA FoodData Central",
-        "sourceUrl": "https://fdc.nal.usda.gov/"
+        "culinaryRole": "Curry & biryani protein chunk",
+        "reason": "Dehydrated defatted soy flour chunks rehydrate into spongy, fibrous morsels that drink in spice marinades identically to braised chicken.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Textured_vegetable_protein"
       },
       {
         "name": "King Oyster / Portobello Mushrooms",
-        "ratio": "1:1 by weight",
-        "dietaryTag": "VEGAN, RICH UMAMI",
-        "culinaryRole": "Meaty texture in gravies & grills",
-        "reason": "Thick fungal cellular structure retains bite upon searing and releases high levels of savory guanylate umami.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/mushroom-varieties-cooking-guide"
+        "ratio": "1:1 ratio by weight",
+        "dietaryTag": "VEGAN, SAVORY UMAMI",
+        "culinaryRole": "Meaty fibrous chew in tikkas",
+        "reason": "Thick meaty stems shred or cube easily, browning into savory caramelized nuggets with deep natural glutamates.",
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/food-features/mushrooms/"
       },
       {
         "name": "Seitan (Wheat Gluten)",
-        "ratio": "1:1 by weight",
-        "dietaryTag": "VEGAN, HIGH-PROTEIN",
-        "culinaryRole": "Tender fibrous poultry alternative",
-        "reason": "Often known as wheat meat, seitan mimics the shredded grain texture of cooked poultry meat better than any other plant protein.",
-        "sourceName": "The Spruce Eats",
-        "sourceUrl": "https://www.thespruceeats.com/what-is-seitan-3376819"
+        "ratio": "1:1 ratio by weight",
+        "dietaryTag": "HIGH-PROTEIN, VEGAN",
+        "culinaryRole": "Dense texture in kebabs & stir-fries",
+        "reason": "Washed wheat flour gluten produces an authentic stringy, fibrous meat-like bite that browns cleanly on grills and skewers.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Seitan"
       }
     ]
   },
   {
     "canonicalName": "Heavy Cream / Malai",
     "category": "Dairy",
-    "aliases": ["heavy cream", "malai", "whipping cream", "fresh cream"],
+    "aliases": [
+      "heavy cream",
+      "cream",
+      "malai",
+      "fresh cream",
+      "whipping cream",
+      "cooking cream"
+    ],
     "substitutes": [
       {
         "name": "Soaked Cashew Cream",
-        "ratio": "1/2 cup raw cashews blended with 1/2 cup water",
-        "dietaryTag": "VEGAN, DAIRY-FREE",
-        "culinaryRole": "Velvety butter chicken & korma gravy",
-        "reason": "Neutral nutty fat that blends into an ultra-smooth emulsion, resisting curdling under acidic or boiling curry conditions.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/cashew-cream-recipe"
+        "ratio": "1:1 ratio by volume",
+        "dietaryTag": "VEGAN, HEART-HEALTHY",
+        "culinaryRole": "Rich Mughlai & makhani gravy thickener",
+        "reason": "Raw cashews soaked and blended with water form a velvety white emulsion with zero dairy, creating restaurant-style shahi gravies.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cashew"
       },
       {
         "name": "Full-Fat Coconut Milk (Top Cream)",
-        "ratio": "1:1 by volume",
+        "ratio": "1:1 ratio by volume",
         "dietaryTag": "VEGAN, DAIRY-FREE",
-        "culinaryRole": "Creamy curries and soups",
-        "reason": "High medium-chain triglyceride content creates luscious richness and silkiness in savory spiced sauces.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/heavy-whipping-cream-substitutes"
+        "culinaryRole": "Silky body in curries and soups",
+        "reason": "Thick canned coconut cream provides luxurious viscosity and clean plant-based saturated fats that simmer without separating.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Coconut_milk"
       },
       {
         "name": "Whole Milk + Melted Butter",
-        "ratio": "3/4 cup whole milk + 1/4 cup melted butter",
-        "dietaryTag": "VEGETARIAN",
-        "culinaryRole": "Everyday cooking & baking cream",
-        "reason": "Re-introduces milkfat into liquid milk to match heavy cream's ~36% fat concentration seamlessly.",
-        "sourceName": "The Spruce Eats",
-        "sourceUrl": "https://www.thespruceeats.com/substitute-for-heavy-cream-4155712"
+        "ratio": "3/4 cup milk + 1/4 cup melted butter",
+        "dietaryTag": "VEGETARIAN, PANTRY-STAPLE",
+        "culinaryRole": "Quick cooking cream replacement",
+        "reason": "Emulsifying melted butter into whole milk restores the 36% butterfat proportion needed for creamy gravies and pasta sauces.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cream"
       }
     ]
   },
   {
     "canonicalName": "Potatoes",
-    "category": "Produce / Starch",
-    "aliases": ["potatoes", "potato", "spiced potato filling", "french fries"],
+    "category": "Produce",
+    "aliases": [
+      "potato",
+      "potatoes",
+      "boiled potato",
+      "mashed potato",
+      "aloo"
+    ],
     "substitutes": [
       {
         "name": "Sweet Potatoes or Yams",
-        "ratio": "1:1 by weight",
-        "dietaryTag": "HIGH-FIBER, VITAMIN-A RICH",
-        "culinaryRole": "Curries, fries & chaat fillings",
-        "reason": "Firm tubers that hold their shape with higher beta-carotene and a lower glycemic index, offering rich savory-sweet balance.",
-        "sourceName": "USDA FoodData Central",
-        "sourceUrl": "https://fdc.nal.usda.gov/"
+        "ratio": "1:1 ratio by weight",
+        "dietaryTag": "BETA-CAROTENE, SLOW-CARB",
+        "culinaryRole": "Samosa filling & aloo sabzi substitute",
+        "reason": "Dense, starchy tubers loaded with vitamin A and dietary fiber, yielding a sweet-savory bite in curries and roasted wedges.",
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/food-features/sweet-potatoes/"
       },
       {
         "name": "Raw Green Banana / Plantain",
-        "ratio": "1:1 by weight",
-        "dietaryTag": "RESISTANT-STARCH, GUT-HEALTHY",
-        "culinaryRole": "Samosa filling & dry sabzi",
-        "reason": "Traditional South Asian starchy alternative with dense texture that cooks tender without turning watery or overly sweet.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/green-bananas-good-or-bad"
+        "ratio": "1:1 ratio by weight",
+        "dietaryTag": "RESISTANT-STARCH, JAIN-FRIENDLY",
+        "culinaryRole": "Crisp chips & firm curry chunks",
+        "reason": "Raw plantains have a neutral, starchy firm texture that holds spices beautifully without becoming mushy.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cooking_banana"
       },
       {
         "name": "Cauliflower Florets",
-        "ratio": "1:1 by volume",
+        "ratio": "1:1 ratio by weight",
         "dietaryTag": "KETO, LOW-CARB",
-        "culinaryRole": "Low-carb aloo gobi & mash",
-        "reason": "Provides tender, fork-crushable body in curries with a fraction of the starch and calories of russet potatoes.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/cauliflower-puree-recipe"
+        "culinaryRole": "Tender vegetable filler",
+        "reason": "Steamed and tossed in curries, cauliflower absorbs cumin and coriander flavors with just 1/4th the calories of russet potatoes.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cauliflower"
       }
     ]
   },
   {
     "canonicalName": "Roasted Peanuts",
     "category": "Nuts & Seeds",
-    "aliases": ["roasted peanuts", "peanuts", "peanut"],
+    "aliases": [
+      "peanuts",
+      "roasted peanuts",
+      "groundnuts",
+      "shengdana",
+      "peanut"
+    ],
     "substitutes": [
       {
         "name": "Roasted Sunflower Seeds or Pumpkin Seeds (Pepitas)",
-        "ratio": "1:1 by weight",
-        "dietaryTag": "NUT-FREE, ALLERGEN-SAFE",
-        "culinaryRole": "Poha crunch & chutney thickening",
-        "reason": "Delivers the crisp nutty bite and toasted oil richness needed in poha and salads without common nut allergens.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/sunflower-seeds"
+        "ratio": "1:1 ratio by weight",
+        "dietaryTag": "NUT-FREE, MINERAL-RICH",
+        "culinaryRole": "Crunchy salad & chutney nutty base",
+        "reason": "Provides identical roasty crunch and healthy unsaturated fats without triggering peanut allergies in school or family meals.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Sunflower_seed"
       },
       {
         "name": "Toasted Cashew Halves",
-        "ratio": "1:1 by weight",
-        "dietaryTag": "VEGETARIAN, LUXURIOUS CRUNCH",
-        "culinaryRole": "Gourmet poha & upma crunch",
-        "reason": "Buttery, sweet crunch that browns gently in ghee, commonly used in festive South Asian rice and breakfast dishes.",
-        "sourceName": "The Spruce Eats",
-        "sourceUrl": "https://www.thespruceeats.com/substitutes-for-peanuts-4155714"
+        "ratio": "1:1 ratio by weight",
+        "dietaryTag": "VEGETARIAN, LUXURY CRUNCH",
+        "culinaryRole": "Poha, upma & biryani garnish",
+        "reason": "Buttery, gently sweet nuts that crisp up in warm ghee to create an appetizing garnish for South Indian and Maharashtrian breakfast dishes.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cashew"
       },
       {
         "name": "Roasted Chana Dal (Dalia / Roasted Bengal Gram)",
-        "ratio": "1:1 by volume",
+        "ratio": "1:1 ratio by weight",
         "dietaryTag": "NUT-FREE, HIGH-PROTEIN",
-        "culinaryRole": "Crisp breakfast tempering crunch",
-        "reason": "Stays crunchy when mixed into warm flattened rice or savory snacks while contributing pure plant-based fiber.",
-        "sourceName": "USDA FoodData Central",
-        "sourceUrl": "https://fdc.nal.usda.gov/"
+        "culinaryRole": "Crisp nutty tempering & chutney body",
+        "reason": "Traditional dry-roasted split chickpeas that offer authentic nutty crunch in South Indian chutneys and poha with zero nut allergens.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chickpea"
       }
     ]
   },
   {
     "canonicalName": "Soy Sauce",
     "category": "Condiments",
-    "aliases": ["soy sauce", "dark soy sauce", "light soy sauce"],
+    "aliases": [
+      "soy sauce",
+      "dark soy sauce",
+      "light soy sauce",
+      "shoyu"
+    ],
     "substitutes": [
       {
         "name": "Coconut Aminos",
-        "ratio": "1:1 (reduce salt in recipe)",
-        "dietaryTag": "SOY-FREE, GLUTEN-FREE, LOW-SODIUM",
-        "culinaryRole": "Marinades & stir-fry sauces",
-        "reason": "Naturally fermented sap of coconut blossoms providing savory dark color and gentle sweetness with 70% less sodium.",
-        "sourceName": "Healthline Nutrition",
-        "sourceUrl": "https://www.healthline.com/nutrition/coconut-aminos"
+        "ratio": "1:1 ratio (slightly sweeter)",
+        "dietaryTag": "SOY-FREE, GLUTEN-FREE",
+        "culinaryRole": "Stir-fry & noodle seasoning",
+        "reason": "Aged coconut blossom sap naturally fermented with mineral sea salt, delivering deep savory umami with 70% less sodium and zero soy.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Coconut_sugar#Coconut_sap_products"
       },
       {
         "name": "Tamari (Gluten-Free)",
-        "ratio": "1:1 by volume",
-        "dietaryTag": "GLUTEN-FREE, RICH UMAMI",
-        "culinaryRole": "Sushi dipping & Asian glazes",
-        "reason": "Brewed with 100% soybeans and no wheat, yielding a darker, smoother, and more intense savory depth than regular soy sauce.",
-        "sourceName": "Serious Eats",
-        "sourceUrl": "https://www.seriouseats.com/do-you-know-the-difference-between-tamari-and-soy-sauce"
+        "ratio": "1:1 ratio by volume",
+        "dietaryTag": "WHEAT-FREE, RICH UMAMI",
+        "culinaryRole": "Dipping sauce & Asian glazes",
+        "reason": "Traditional Japanese miso liquid byproduct brewed with 100% soybeans, offering a thicker texture, darker sheen, and no gluten.",
+        "sourceName": "Wikipedia",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Soy_sauce#Tamari"
       },
       {
         "name": "Mushroom Broth Reduction + Sea Salt",
-        "ratio": "1:1 with 1/4 tsp salt per tbsp broth",
-        "dietaryTag": "SOY-FREE, ALL-NATURAL",
-        "culinaryRole": "Umami seasoning liquid",
-        "reason": "Concentrated dried shiitake reduction supplies natural guanylate savory notes that mimic fermented soy amino acids.",
-        "sourceName": "The Spruce Eats",
-        "sourceUrl": "https://www.thespruceeats.com/soy-sauce-substitutes-4155715"
+        "ratio": "1:1 ratio by volume",
+        "dietaryTag": "SOY-FREE, VEGAN",
+        "culinaryRole": "Deep glutamate broth enhancement",
+        "reason": "Simmered dried shiitake and button mushrooms release concentrated natural ribonucleotides that emulate fermented soy savory notes.",
+        "sourceName": "Harvard T.H. Chan School of Public Health",
+        "sourceUrl": "https://nutritionsource.hsph.harvard.edu/food-features/mushrooms/"
       }
     ]
   }
